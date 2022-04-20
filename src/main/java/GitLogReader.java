@@ -23,7 +23,7 @@ public class GitLogReader {
         while ((x = commit.iterator().next())!=null) {
             System.out.println(x.getCommitterIdent().getName());
             System.out.println(x.getCommitterIdent().getWhen().toString());
-            System.out.println(x.getId().toString());
+            System.out.println(x.getId());
             System.out.println(x.getShortMessage());
             System.out.println("-----");
         }
