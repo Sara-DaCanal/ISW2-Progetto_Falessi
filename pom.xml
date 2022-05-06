@@ -18,6 +18,23 @@
             <artifactId>org.eclipse.jgit.pgm</artifactId>
             <version>6.1.0.202203080745-r</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20220320</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+
+
     </dependencies>
 
 
