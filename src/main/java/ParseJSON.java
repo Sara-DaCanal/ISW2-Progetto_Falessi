@@ -3,7 +3,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.lang.module.ModuleDescriptor;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
@@ -19,6 +18,7 @@ public class ParseJSON {
     public void setProjectName(String name){
         this.projectName=name;
     }
+    public String getProjectName(){ return this.projectName; }
 
     public List<Version> getVersionArray() throws JSONException, ParseException, IOException {
 
@@ -104,8 +104,7 @@ public class ParseJSON {
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
-            JSONObject json = new JSONObject(jsonText);
-            return json;
+            return new JSONObject(jsonText);
         } finally {
             is.close();
         }
