@@ -3,7 +3,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.Edit;
-import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
@@ -30,7 +29,7 @@ public class DiffList {
         table = new File("table_"+myJSON.getProjectName().toLowerCase()+".csv");
         tableWriter = new FileWriter(table);
         writer = new CSVWriter(tableWriter);
-        String[] header = {"Version", "File", "Size"};
+        String[] header = {"Version", "File", "Size", "Commit_number"};
         writer.writeNext(header);
         this.path=new CSVList();
         int i=-1, j=0;
@@ -67,6 +66,7 @@ public class DiffList {
                             if(l!=null) {
                                 l.setVersion(newLine.getVersion());
                                 l.addSize(newLine.getSize());
+                                l.increaseCommit();
                             }
                         }
                     }
