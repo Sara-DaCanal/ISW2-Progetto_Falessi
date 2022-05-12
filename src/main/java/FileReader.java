@@ -10,8 +10,8 @@ public class FileReader {
 
     public static void main(String[] arg) throws GitAPIException, IOException, JSONException, ParseException {
         ParseJSON myJson = new ParseJSON();
-        myJson.setProjectName("SYNCOPE");
-        CommitRetriever commitRetriever = new CommitRetriever("https://github.com/apache/syncope.git", myJson);
+        myJson.setProjectName("BOOKKEEPER");
+        CommitRetriever commitRetriever = new CommitRetriever("https://github.com/Sara-DaCanal/bookkeeper.git", myJson);
         List<Version> verList = myJson.getVersionArray();
         DiffList diffList = new DiffList(commitRetriever.getCommit(),commitRetriever.getGit(),verList,myJson);
     }

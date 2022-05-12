@@ -13,7 +13,7 @@ public class Version {
     }
 
     public void setReleaseDate(String date) throws ParseException {
-        this.releaseDate = new SimpleDateFormat("yyyy-mm-dd").parse(date);
+        this.releaseDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
     }
     public Date getReleaseDate(){
         return this.releaseDate;
