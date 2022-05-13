@@ -28,7 +28,7 @@ public class FileReader {
         for(int m=0; m<map.size(); m++) {
             for (int p = 0; p < map.get(m).size(); p++) {
                 CSVLine line = map.get(m).get(p);
-                if (!line.getVersion().equals(map.get(m).getVersion()))
+                if (!line.getVersion().equals(map.get(m).getVersion().getName()))
                     line.setVersion(map.get(m).getVersion().getName());
                 String[] data = line.toStringArray();
                 writer.writeNext(data);

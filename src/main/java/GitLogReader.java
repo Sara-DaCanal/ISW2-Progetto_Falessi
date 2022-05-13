@@ -10,12 +10,15 @@ public class GitLogReader {
 
     public static void main(String[] arg) throws GitAPIException, IOException {
         File log = new File("./log");
-        Git git;
+        Git git=null;
         try {
             git = Git.cloneRepository().setURI("https://github.com/Sara-DaCanal/prova_maven.git").setDirectory(log).setCloneAllBranches(true).call();
         } catch (JGitInternalException e){
             git = Git.open(log);
             git.pull().call();
+        }
+        finally {
+            git.close();
         }
         Iterable<RevCommit> commit;
         commit = git.log().call();
