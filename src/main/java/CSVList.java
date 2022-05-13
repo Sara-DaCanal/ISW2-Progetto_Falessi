@@ -4,9 +4,18 @@ import java.util.List;
 public class CSVList {
 
     private List<CSVLine> list;
+    private Version version;
 
     public CSVList(){
         this.list=new ArrayList<>();
+    }
+
+    public Version getVersion() {
+        return version;
+    }
+
+    public void setVersion(Version version) {
+        this.version = version;
     }
 
     public boolean contains(CSVLine myLine){

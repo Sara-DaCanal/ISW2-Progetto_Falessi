@@ -21,6 +21,8 @@ public class CommitRetriever {
         } catch (JGitInternalException e){
             this.git = Git.open(this.repo);
             this.git.pull().call();
+        }finally {
+            this.git.close();
         }
         this.itCommit = this.git.log().call();
         invert(this.itCommit);
