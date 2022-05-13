@@ -31,6 +31,23 @@ public class CSVLine {
         this.authNames = new ArrayList<>();
     }
 
+    public CSVLine(String version, String path, long size, int commitNumber, long locTouch, long locAdded, long maxLocAdded, long avgLocAdded, long churn, long maxChurn, long avgChurn, ArrayList authNames){
+        this.version=version;
+        this.path=path;
+        this.size=size;
+        this.commitNumber=commitNumber;
+        this.locTouch=locTouch;
+        this.locAdded = locAdded;
+        this.maxLocAdded=maxLocAdded;
+        this.avgLocAdded=avgLocAdded;
+        this.churn = churn;
+        this.maxChurn=maxChurn;
+        this.avgChurn=avgChurn;
+        this.authNames = new ArrayList<>();
+        this.authNames.addAll(authNames);
+    }
+
+
     public void setPath(String path) {
         this.path = path;
     }
@@ -93,6 +110,18 @@ public class CSVLine {
 
     public void setMaxLocAdded(long maxLocAdded) {
         this.maxLocAdded = maxLocAdded;
+    }
+
+    public long getChurn() {
+        return churn;
+    }
+
+    public long getAvgChurn() {
+        return avgChurn;
+    }
+
+    public long getMaxChurn() {
+        return maxChurn;
     }
 
     public List<String> getAuthNames() {

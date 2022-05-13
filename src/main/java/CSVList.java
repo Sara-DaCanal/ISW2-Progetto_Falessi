@@ -10,6 +10,17 @@ public class CSVList {
         this.list=new ArrayList<>();
     }
 
+    public static CSVList copyOf(CSVList list){
+        CSVList copy = new CSVList();
+        for(int i=0; i< list.size();i++){
+            CSVLine l = list.get(i);
+            copy.add(new CSVLine(l.getVersion(),l.getPath(),l.getSize(),l.getCommitNumber(), l.getLocTouch(),l.getLocAdded(),l.getMaxLocAdded(),l.getMaxLocAdded(),l.getChurn(), l.getMaxChurn()
+                    ,l.getAvgChurn(), new ArrayList(l.getAuthNames())));
+        }
+        copy.version=list.version;
+        return copy;
+    }
+
     public Version getVersion() {
         return version;
     }
@@ -27,9 +38,9 @@ public class CSVList {
         return false;
     }
 
-    public CSVLine pathContains(CSVLine myLine){
+    public CSVLine pathContains(String mypath){
         for (CSVLine l:this.list) {
-            if(myLine.getPath().contentEquals(l.getPath())){
+            if(l.getPath().contentEquals(mypath)){
                 return l;
             }
         }

@@ -6,9 +6,11 @@ public class LOC {
     private long addedLines;
     private long deletedLines;
     private long modifiedLines;
+    private long size;
 
-    public LOC(List<Edit> editList){
+    public LOC(List<Edit> editList, long size){
         this.editList=editList;
+        this.size=0;
         this.addedLines=0;
         this.deletedLines=0;
         this.modifiedLines=0;
@@ -28,11 +30,12 @@ public class LOC {
                     deletedLines += diffA-diffB;
                 }
             }
+            this.size=(this.addedLines-this.deletedLines);
         }
     }
 
     public long getSize() {
-        return addedLines - deletedLines;
+        return size;
     }
 
     public long getLOCTouched(){

@@ -41,8 +41,7 @@ public class DiffList {
             if(i!=-1) oldCommit = commit.get(i);
             RevCommit newCommit = commit.get(i+1);
             if(new Date((newCommit.getCommitTime()*1000L)).after(myV.getReleaseDate())) {
-                this.map.add(path);
-                path=new CSVList();
+                this.map.add(CSVList.copyOf(path));
                 myV=versions.get(++j);
                 path.setVersion(myV);
             }
@@ -57,7 +56,10 @@ public class DiffList {
                     diffFormatter.setRepository(git.getRepository());
                     this.diffEntries = diffFormatter.scan(oldTreeIterator, newTreeIterator);
                     for (DiffEntry entry : this.diffEntries) {
-                        LOC locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList());
+                        CSVLine l = path.pathContains(entry.getNewPath());
+                        LOC locCounter;
+                        if(l!=null)locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), l.getSize());
+                        else locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), 0);
                         long size = locCounter.getSize();
                         long locTouched = locCounter.getLOCTouched();
                         long locAdded = locCounter.getLOCAdded();
@@ -65,29 +67,20 @@ public class DiffList {
                         CSVLine oldLine = new CSVLine(myV.getName(), entry.getOldPath(), size, locTouched, locAdded);
                         newLine.addAuthNames(authName);
                         if (entry.getChangeType() == DiffEntry.ChangeType.ADD) {
-                            CSVLine l = path.pathContains(newLine);
                             if(l==null && entry.getNewPath().endsWith(".java"))
                                 path.add(newLine);
                             else if(l!=null) {
-                                l.setVersion(newLine.getVersion());
-                                l.addSize(newLine.getSize());
-                                l.addLocTouched(newLine.getLocTouch());
-                                l.addLoc(newLine.getLocAdded());
-                                l.addAuthNames(authName);
+                                changeLine(l,newLine);
                             }
                         }
                         if (entry.getChangeType() == DiffEntry.ChangeType.DELETE) {
                             path.remove(oldLine);
                         }
                         if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY) {
-                            CSVLine l = path.pathContains(newLine);
                             if(l!=null) {
-                                l.setVersion(newLine.getVersion());
-                                l.addSize(newLine.getSize());
-                                l.addLocTouched(newLine.getLocTouch());
-                                l.addLoc(newLine.getLocAdded());
-                                l.increaseCommit();
-                                l.addAuthNames(authName);
+                                changeLine(l,newLine);
+                                if(l.getVersion()!=newLine.getVersion())l.setCommitNumber(1);
+                                else l.increaseCommit();
                             }
                         }
                     }
@@ -96,6 +89,20 @@ public class DiffList {
             i++;
         }
 
+    }
+
+    private void changeLine(CSVLine l, CSVLine newLine){
+        l.addSize(newLine.getSize());
+        if(!l.getVersion().equals(newLine.getVersion())){
+            l.setVersion(newLine.getVersion());
+            l.setLocAdded(newLine.getLocAdded());
+            l.setLocTouch(l.getLocTouch());
+        }
+        else {
+            l.addLocTouched(newLine.getLocTouch());
+            l.addLoc(newLine.getLocAdded());
+        }
+        l.addAuthNames(newLine.getAuthNames().get(0));
     }
 
     private Bug searchBug(RevCommit commit){
