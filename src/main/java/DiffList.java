@@ -66,29 +66,34 @@ public class DiffList {
                         CSVLine newLine = new CSVLine(myV.getName(), entry.getNewPath(), size, locTouched, locAdded);
                         CSVLine oldLine = new CSVLine(myV.getName(), entry.getOldPath(), size, locTouched, locAdded);
                         newLine.addAuthNames(authName);
-                        if (entry.getChangeType() == DiffEntry.ChangeType.ADD) {
-                            if(l==null && entry.getNewPath().endsWith(".java"))
-                                path.add(newLine);
-                            else if(l!=null) {
-                                changeLine(l,newLine);
-                            }
-                        }
-                        if (entry.getChangeType() == DiffEntry.ChangeType.DELETE) {
-                            path.remove(oldLine);
-                        }
-                        if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY) {
-                            if(l!=null) {
-                                changeLine(l,newLine);
-                                if(l.getVersion()!=newLine.getVersion())l.setCommitNumber(1);
-                                else l.increaseCommit();
-                            }
-                        }
+                        changeType(entry,newLine,oldLine,path);
                     }
                 }
             }
             i++;
         }
 
+    }
+
+    private void changeType(DiffEntry entry, CSVLine newLine, CSVLine oldLine, CSVList path){
+        CSVLine l = path.pathContains(entry.getNewPath());
+        if (entry.getChangeType() == DiffEntry.ChangeType.ADD) {
+            if(l==null && entry.getNewPath().endsWith(".java"))
+                path.add(newLine);
+            else if(l!=null) {
+                changeLine(l,newLine);
+            }
+        }
+        if (entry.getChangeType() == DiffEntry.ChangeType.DELETE) {
+            path.remove(oldLine);
+        }
+        if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY) {
+            if(l!=null) {
+                changeLine(l,newLine);
+                if(l.getVersion()!=newLine.getVersion())l.setCommitNumber(1);
+                else l.increaseCommit();
+            }
+        }
     }
 
     private void changeLine(CSVLine l, CSVLine newLine){
