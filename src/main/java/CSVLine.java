@@ -105,7 +105,7 @@ public class CSVLine {
     }
 
     public String[] toStringArray(){
-        String[] arr = {this.version, this.path,
+        return new String[]{this.version, this.path,
                 Long.toString(this.size),
                 Integer.toString(this.commitNumber),
                 Long.toString(this.locTouch),
@@ -116,7 +116,7 @@ public class CSVLine {
                 Long.toString(this.maxChurn),
                 Long.toString(this.avgChurn),
                 Integer.toString(this.authNames.size())};
-        return arr;
+
     }
 
     public boolean isEqual(CSVLine l){
@@ -128,8 +128,8 @@ public class CSVLine {
     }
 
     public boolean isPathEqual(CSVLine l){
-        if(this.path.contentEquals(l.path)) return true;
-        else return false;
+        return this.path.contentEquals(l.path);
+
     }
 
     public void addSize(long s){

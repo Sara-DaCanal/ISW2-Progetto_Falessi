@@ -1,5 +1,4 @@
-import com.opencsv.CSVWriter;
-import org.eclipse.jetty.util.PatternMatcher;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -9,13 +8,9 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
-
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,7 +31,8 @@ public class DiffList {
         this.versions=myJSON.getVersionArray();
         this.map=new ArrayList<>();
 
-        int i=-1, j=0;
+        int i=-1;
+        int j=0;
         RevCommit oldCommit=null;
         Version myV = versions.get(0);
         CSVList path = new CSVList();
