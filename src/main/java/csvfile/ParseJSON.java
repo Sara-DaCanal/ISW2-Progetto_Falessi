@@ -17,6 +17,8 @@ public class ParseJSON {
     private List<Version> verList = new ArrayList<>();
     private String projectName;
     private List<Bug> bugList = new ArrayList<>();
+    private String relDate = "releaseDate";
+    private String rel = "released";
 
 
     public void setProjectName(String name){
@@ -40,10 +42,10 @@ public class ParseJSON {
             for (; i < total && i < j; i++) {
                 //Iterate through each bug
                 JSONObject ver = values.getJSONObject(i % 1000);
-                if (!ver.isEmpty() && ver.get("released").toString().contentEquals( "true")) {
+                if (!ver.isEmpty() && ver.get(rel).toString().contentEquals( "true")) {
                     Version y = new Version();
                     y.setName(ver.get("name").toString());
-                    y.setReleaseDate(ver.get("releaseDate").toString());
+                    y.setReleaseDate(ver.get(relDate).toString());
                     if(!is(y)) this.verList.add(y);
                 }
             }
@@ -70,8 +72,6 @@ public class ParseJSON {
             JSONArray issues = json.getJSONArray("issues");
             total = json.getInt("total");
             for (; i < total && i < j; i++) {
-                String relDate = "releaseDate";
-                String rel = "released";
                 String key = issues.getJSONObject(i % 1000).get("key").toString();
                 Bug b = new Bug(key);
                 JSONArray fixVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("fixVersions");
@@ -95,8 +95,8 @@ public class ParseJSON {
 
     private void iterate(JSONArray ver, Version v) throws ParseException {
         for(int k=1;k<ver.length();k++){
-            if(ver.getJSONObject(k).get("released").toString().equals("true") && v.getReleaseDate()!=null && v.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(ver.getJSONObject(k).get("releaseDate").toString()))){
-                v.setReleaseDate(ver.getJSONObject(k).get("releaseDate").toString());
+            if(ver.getJSONObject(k).get(rel).toString().equals("true") && v.getReleaseDate()!=null && v.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(ver.getJSONObject(k).get(relDate).toString()))){
+                v.setReleaseDate(ver.getJSONObject(k).get(relDate).toString());
                 v.setName(ver.getJSONObject(k).get("name").toString());
             }
         }
