@@ -23,6 +23,7 @@ public class DiffList {
     private ParseJSON json;
     private List<Bug> bugList;
     private List<Version> versions;
+    private List<RevCommit> commit;
 
     public DiffList(List<RevCommit> commit, Git git, ParseJSON myJSON) throws IOException, ParseException {
         this.git=git;
@@ -30,6 +31,7 @@ public class DiffList {
         this.bugList=myJSON.getBugList();
         this.versions=myJSON.getVersionArray();
         this.map=new ArrayList<>();
+        this.commit=commit;
 
         int i=-1;
         int j=0;
@@ -47,7 +49,6 @@ public class DiffList {
             }
             String authName = newCommit.getAuthorIdent().getName();
             Bug bug = searchBug(newCommit);
-            if(bug!=null) System.out.println(i+"----"+bug.getKey()+"\t"+bug.getFixedVersion().getName()+"-"+myV.getName());
             try (ObjectReader reader = this.git.getRepository().newObjectReader()) {
                 AbstractTreeIterator oldTreeIterator = new EmptyTreeIterator();
                 if(i!=-1) oldTreeIterator = new CanonicalTreeParser(null, reader, oldCommit.getTree().getId());
@@ -67,12 +68,28 @@ public class DiffList {
                         CSVLine oldLine = new CSVLine(myV.getName(), entry.getOldPath(), size, locTouched, locAdded);
                         newLine.addAuthNames(authName);
                         changeType(entry,newLine,oldLine,path);
+                        labeling(bug, entry);
                     }
                 }
             }
             i++;
         }
 
+    }
+
+    public void labeling(Bug bug, DiffEntry entry){
+        if(bug!=null && !bug.getFixedVersion().equals(bug.getAffectedVersion())){
+            boolean in = false;
+            for(int i=0; i<this.map.size(); i++){
+                if(map.get(i).getVersion().equals(bug.getAffectedVersion())) in = true;
+                if(map.get(i).getVersion().equals(bug.getAffectedVersion())) in=false;
+                if(in = true){
+                    CSVLine l = map.get(i).pathContains(entry.getNewPath());
+                    if(l!=null)
+                    l.setBuggy(true);
+                }
+            }
+        }
     }
 
     private void changeType(DiffEntry entry, CSVLine newLine, CSVLine oldLine, CSVList path){
@@ -90,7 +107,7 @@ public class DiffList {
         if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY) {
             if(l!=null) {
                 changeLine(l,newLine);
-                if(l.getVersion()!=newLine.getVersion())l.setCommitNumber(1);
+                if(!l.getVersion().equals(newLine.getVersion()))l.setCommitNumber(1);
                 else l.increaseCommit();
             }
         }

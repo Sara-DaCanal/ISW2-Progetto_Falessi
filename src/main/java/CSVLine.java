@@ -15,6 +15,7 @@ public class CSVLine {
     private long maxChurn;
     private long avgChurn;
     private List<String> authNames;
+    private boolean buggy;
 
     public CSVLine(String version, String path, long size,long locTouch, long locAdded){
         this.version=version;
@@ -29,6 +30,7 @@ public class CSVLine {
         this.maxChurn=size;
         this.avgChurn=size;
         this.authNames = new ArrayList<>();
+        this.buggy=false;
     }
 
     public CSVLine(String version, String path, long size, int commitNumber, long locTouch, long locAdded, long maxLocAdded, long avgLocAdded, long churn, long maxChurn, long avgChurn, ArrayList authNames){
@@ -45,8 +47,12 @@ public class CSVLine {
         this.avgChurn=avgChurn;
         this.authNames = new ArrayList<>();
         this.authNames.addAll(authNames);
+        this.buggy=false;
     }
 
+    public void setBuggy(boolean buggy) {
+        this.buggy = buggy;
+    }
 
     public void setPath(String path) {
         this.path = path;
@@ -144,7 +150,8 @@ public class CSVLine {
                 Long.toString(this.churn),
                 Long.toString(this.maxChurn),
                 Long.toString(this.avgChurn),
-                Integer.toString(this.authNames.size())};
+                Integer.toString(this.authNames.size()),
+                Boolean.toString(this.buggy)};
 
     }
 
