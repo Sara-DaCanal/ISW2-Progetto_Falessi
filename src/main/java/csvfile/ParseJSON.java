@@ -83,9 +83,9 @@ public class ParseJSON {
             JSONArray fixVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("fixVersions");
             Version fv = new Version();
             fv.setName(fixVer.getJSONObject(0).get("name").toString());
-            fv.setReleaseDate(fixVer.getJSONObject(0).get(relDate).toString());
+            if(fixVer.getJSONObject(0).get("released").toString().equals("true")) fv.setReleaseDate(fixVer.getJSONObject(0).get(relDate).toString());
             for(int k=1;k<fixVer.length();k++){
-                if(fv.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(fixVer.getJSONObject(k).get(relDate).toString()))){
+                if(fixVer.getJSONObject(k).get("released").toString().equals("true") && fv.getReleaseDate()!=null && fv.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(fixVer.getJSONObject(k).get(relDate).toString()))){
                     fv.setReleaseDate(fixVer.getJSONObject(k).get(relDate).toString());
                     fv.setName(fixVer.getJSONObject(k).get("name").toString());
                 }
@@ -93,16 +93,16 @@ public class ParseJSON {
             JSONArray affVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("versions");
             Version av = new Version();
             av.setName(affVer.getJSONObject(0).get("name").toString());
-            av.setReleaseDate(affVer.getJSONObject(0).get(relDate).toString());
+            if(affVer.getJSONObject(0).get("released").toString().equals("true")) av.setReleaseDate(affVer.getJSONObject(0).get(relDate).toString());
             for(int k=1;k<affVer.length();k++){
-                if(av.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(affVer.getJSONObject(k).get(relDate).toString()))){
+                if(affVer.getJSONObject(k).get("released").toString().equals("true") && av.getReleaseDate()!=null && av.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(affVer.getJSONObject(k).get(relDate).toString()))){
                     av.setReleaseDate(affVer.getJSONObject(k).get(relDate).toString());
                     av.setName(affVer.getJSONObject(k).get("name").toString());
                 }
             }
             b.setAffectedVersion(av);
             b.setFixedVersion(fv);
-            this.bugList.add(b);
+            if(fv.getReleaseDate()!=null && av.getReleaseDate()!=null) this.bugList.add(b);
         }
         return i;
     }

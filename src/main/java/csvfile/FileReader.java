@@ -18,8 +18,10 @@ public class FileReader {
         FileWriter tableWriter;
         CSVWriter writer;
         ParseJSON myJson = new ParseJSON();
-        myJson.setProjectName("BOOKKEEPER");
-        CommitRetriever commitRetriever = new CommitRetriever("https://github.com/Sara-DaCanal/bookkeeper.git", myJson);
+        myJson.setProjectName("SYNCOPE");
+        String url = "https://github.com/apache/syncope.git";
+        //String url = "https://github.com/Sara-DaCanal/bookkeeper.git";
+        CommitRetriever commitRetriever = new CommitRetriever(url, myJson);
         DiffList diffList = new DiffList(commitRetriever.getCommit(),commitRetriever.getGit(),myJson);
         List<CSVList> map = diffList.getPath();
         table = new File("table_"+myJson.getProjectName().toLowerCase()+".csv");
