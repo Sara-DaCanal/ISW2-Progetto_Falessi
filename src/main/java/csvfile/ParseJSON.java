@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,20 +37,25 @@ public class ParseJSON {
             JSONObject json = readJsonFromUrl(url);
             JSONArray values = json.getJSONArray("values");
             total = json.getInt("total");
-            for (; i < total && i < j; i++) {
-                //Iterate through each bug
-                JSONObject ver = values.getJSONObject(i % 1000);
-                if (!ver.isEmpty() && ver.get("released").toString().contentEquals( "true")) {
-                    Version y = new Version();
-                    y.setName(ver.get("name").toString());
-                    y.setReleaseDate(ver.get("releaseDate").toString());
-                    if(!is(y)) this.verList.add(y);
-                }
-            }
+            i=iterate(i,total,j, values);
         }while (i < total);
         Integer length=this.verList.size();
         mergeSort(this.verList, length);
         return this.verList;
+    }
+
+    private int iterate(int i, int total, int j, JSONArray values) throws ParseException {
+        for (; i < total && i < j; i++) {
+            //Iterate through each bug
+            JSONObject ver = values.getJSONObject(i % 1000);
+            if (!ver.isEmpty() && ver.get("released").toString().contentEquals( "true")) {
+                Version y = new Version();
+                y.setName(ver.get("name").toString());
+                y.setReleaseDate(ver.get("releaseDate").toString());
+                if(!is(y)) this.verList.add(y);
+            }
+        }
+        return i;
     }
 
     public List<Bug> getBugList() throws IOException, ParseException {
@@ -158,9 +162,9 @@ public class ParseJSON {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));){
             String jsonText = readAll(rd);
             return new JSONObject(jsonText);}
-         catch(IOException | JSONException e) {
+         finally{
             is.close();
-            return null;
+
         }
     }
     private boolean is(Version v){

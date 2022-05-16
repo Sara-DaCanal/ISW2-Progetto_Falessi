@@ -28,7 +28,7 @@ public class Version {
         return this.name;
     }
 
-    public boolean equals(Version v){
+    public boolean equalV(Version v){
         return this.name.equals(v.name);
     }
 
