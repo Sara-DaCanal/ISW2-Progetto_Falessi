@@ -1,3 +1,6 @@
+package CSVFile;
+
+import CSVFile.Bug;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +96,7 @@ public class ParseJSON {
         return this.bugList;
     }
 
-    private static void merge(List<Version> left_arr,List<Version> right_arr, List<Version> arr,Integer left_size, Integer right_size){
+    private static void merge(List<Version> left_arr, List<Version> right_arr, List<Version> arr, Integer left_size, Integer right_size){
 
         int i=0,l=0,r = 0;
         //The while loops check the conditions for merging

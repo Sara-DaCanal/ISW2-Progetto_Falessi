@@ -1,4 +1,8 @@
+package CSVFile;
 
+import CSVFile.Bug;
+import CSVFile.CSVLine;
+import CSVFile.CSVList;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;

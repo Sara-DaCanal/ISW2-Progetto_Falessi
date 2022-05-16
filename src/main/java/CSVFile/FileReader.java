@@ -1,3 +1,9 @@
+package CSVFile;
+
+import CSVFile.CSVLine;
+import CSVFile.CSVList;
+import CSVFile.CommitRetriever;
+import CSVFile.DiffList;
 import com.opencsv.CSVWriter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;
@@ -22,7 +28,7 @@ public class FileReader {
         table = new File("table_"+myJson.getProjectName().toLowerCase()+".csv");
         tableWriter = new FileWriter(table);
         writer = new CSVWriter(tableWriter);
-        String[] header = {"Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
+        String[] header = {"CSVFile.Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
                 "Churn", "Max churn", "Avg churn", "Authors numbers"};
         writer.writeNext(header);
         for(int m=0; m<map.size(); m++) {
