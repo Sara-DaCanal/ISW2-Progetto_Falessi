@@ -1,4 +1,4 @@
-package CSVFile;
+package csvfile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,18 +35,18 @@ public class CSVLine {
         this.buggy=false;
     }
 
-    public CSVLine(String version, String path, long size, int commitNumber, long locTouch, long locAdded, long maxLocAdded, long avgLocAdded, long churn, long maxChurn, long avgChurn, ArrayList authNames){
+    public CSVLine(String version, String path, long size, int commitNumber, long loc[],  List<String> authNames){
         this.version=version;
         this.path=path;
         this.size=size;
         this.commitNumber=commitNumber;
-        this.locTouch=locTouch;
-        this.locAdded = locAdded;
-        this.maxLocAdded=maxLocAdded;
-        this.avgLocAdded=avgLocAdded;
-        this.churn = churn;
-        this.maxChurn=maxChurn;
-        this.avgChurn=avgChurn;
+        this.locTouch=loc[0];
+        this.locAdded = loc[1];
+        this.maxLocAdded=loc[2];
+        this.avgLocAdded=loc[3];
+        this.churn = loc[4];
+        this.maxChurn=loc[5];
+        this.avgChurn=loc[6];
         this.authNames = new ArrayList<>();
         this.authNames.addAll(authNames);
         this.buggy=false;
@@ -161,8 +161,8 @@ public class CSVLine {
         if(!this.version.contentEquals(l.version)) return false;
         else if(!this.path.contentEquals(l.path)) return false;
         else if(this.size != l.size) return false;
-        else if(this.commitNumber!=l.commitNumber) return false;
-        else return true;
+        else return !(this.commitNumber!=l.commitNumber);
+
     }
 
     public boolean isPathEqual(CSVLine l){

@@ -1,6 +1,5 @@
-package CSVFile;
+package csvfile;
 
-import CSVFile.Bug;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

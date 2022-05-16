@@ -1,4 +1,4 @@
-package CSVFile;
+package csvfile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,9 @@ public class CSVList {
         CSVList copy = new CSVList();
         for(int i=0; i< list.size();i++){
             CSVLine l = list.get(i);
-            copy.add(new CSVLine(l.getVersion(),l.getPath(),l.getSize(),l.getCommitNumber(), l.getLocTouch(),l.getLocAdded(),l.getMaxLocAdded(),l.getMaxLocAdded(),l.getChurn(), l.getMaxChurn()
-                    ,l.getAvgChurn(), new ArrayList(l.getAuthNames())));
+            long[] loc = {l.getLocTouch(),l.getLocAdded(),l.getMaxLocAdded(),l.getMaxLocAdded(),l.getChurn(), l.getMaxChurn()
+                    ,l.getAvgChurn()};
+            copy.add(new CSVLine(l.getVersion(),l.getPath(),l.getSize(),l.getCommitNumber(), loc, new ArrayList(l.getAuthNames())));
         }
         copy.version=list.version;
         return copy;

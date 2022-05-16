@@ -1,4 +1,4 @@
-package CSVFile;
+package csvfile;
 
 import org.eclipse.jgit.diff.Edit;
 import java.util.List;

@@ -1,4 +1,4 @@
-package CSVFile;
+package csvfile;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;

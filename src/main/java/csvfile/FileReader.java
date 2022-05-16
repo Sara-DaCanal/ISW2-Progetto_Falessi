@@ -1,9 +1,5 @@
-package CSVFile;
+package csvfile;
 
-import CSVFile.CSVLine;
-import CSVFile.CSVList;
-import CSVFile.CommitRetriever;
-import CSVFile.DiffList;
 import com.opencsv.CSVWriter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;

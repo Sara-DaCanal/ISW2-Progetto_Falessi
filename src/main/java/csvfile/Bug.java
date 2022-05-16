@@ -1,4 +1,4 @@
-package CSVFile;
+package csvfile;
 
 public class Bug {
     private String key;
