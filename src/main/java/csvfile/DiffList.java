@@ -77,7 +77,7 @@ public class DiffList {
     }
 
     public void labeling(Bug bug, DiffEntry entry){
-        if(bug!=null && !bug.getFixedVersion().equals(bug.getAffectedVersion())){
+        if(bug!=null){
             boolean in = false;
             for(int i=0; i<this.map.size(); i++){
                 if(map.get(i).getVersion().equalV(bug.getAffectedVersion())) in = true;

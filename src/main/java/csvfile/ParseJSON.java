@@ -37,32 +37,29 @@ public class ParseJSON {
             JSONObject json = readJsonFromUrl(url);
             JSONArray values = json.getJSONArray("values");
             total = json.getInt("total");
-            i=iterate(i,total,j, values);
+            for (; i < total && i < j; i++) {
+                //Iterate through each bug
+                JSONObject ver = values.getJSONObject(i % 1000);
+                if (!ver.isEmpty() && ver.get("released").toString().contentEquals( "true")) {
+                    Version y = new Version();
+                    y.setName(ver.get("name").toString());
+                    y.setReleaseDate(ver.get("releaseDate").toString());
+                    if(!is(y)) this.verList.add(y);
+                }
+            }
         }while (i < total);
         Integer length=this.verList.size();
         mergeSort(this.verList, length);
         return this.verList;
     }
 
-    private int iterate(int i, int total, int j, JSONArray values) throws ParseException {
-        for (; i < total && i < j; i++) {
-            //Iterate through each bug
-            JSONObject ver = values.getJSONObject(i % 1000);
-            if (!ver.isEmpty() && ver.get("released").toString().contentEquals( "true")) {
-                Version y = new Version();
-                y.setName(ver.get("name").toString());
-                y.setReleaseDate(ver.get("releaseDate").toString());
-                if(!is(y)) this.verList.add(y);
-            }
-        }
-        return i;
-    }
+
 
     public List<Bug> getBugList() throws IOException, ParseException {
         int i=0;
         int j;
         int total;
-        String relDate = "releaseDate";
+
         do {
             j=1000+i;
             String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22"
@@ -72,36 +69,42 @@ public class ParseJSON {
             JSONObject json = readJsonFromUrl(url);
             JSONArray issues = json.getJSONArray("issues");
             total = json.getInt("total");
-            for (; i < total && i < j; i++) {
-                String key = issues.getJSONObject(i % 1000).get("key").toString();
-                Bug b = new Bug(key);
-                JSONArray fixVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("fixVersions");
-                Version fv = new Version();
-                fv.setName(fixVer.getJSONObject(0).get("name").toString());
-                fv.setReleaseDate(fixVer.getJSONObject(0).get(relDate).toString());
-                for(int k=1;k<fixVer.length();k++){
-                    if(fv.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(fixVer.getJSONObject(k).get(relDate).toString()))){
-                        fv.setReleaseDate(fixVer.getJSONObject(k).get(relDate).toString());
-                        fv.setName(fixVer.getJSONObject(k).get("name").toString());
-                    }
-                }
-                JSONArray affVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("versions");
-                Version av = new Version();
-                av.setName(affVer.getJSONObject(0).get("name").toString());
-                av.setReleaseDate(affVer.getJSONObject(0).get(relDate).toString());
-                for(int k=1;k<affVer.length();k++){
-                    if(av.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(affVer.getJSONObject(k).get(relDate).toString()))){
-                        av.setReleaseDate(affVer.getJSONObject(k).get(relDate).toString());
-                        av.setName(affVer.getJSONObject(k).get("name").toString());
-                    }
-                }
-                b.setAffectedVersion(av);
-                b.setFixedVersion(fv);
-                this.bugList.add(b);
-            }
+            i=iterate(i,total,j,issues);
         }while(i<total);
 
         return this.bugList;
+    }
+
+    private int iterate(int i, int total, int j, JSONArray issues) throws ParseException {
+        for (; i < total && i < j; i++) {
+            String relDate = "releaseDate";
+            String key = issues.getJSONObject(i % 1000).get("key").toString();
+            Bug b = new Bug(key);
+            JSONArray fixVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("fixVersions");
+            Version fv = new Version();
+            fv.setName(fixVer.getJSONObject(0).get("name").toString());
+            fv.setReleaseDate(fixVer.getJSONObject(0).get(relDate).toString());
+            for(int k=1;k<fixVer.length();k++){
+                if(fv.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(fixVer.getJSONObject(k).get(relDate).toString()))){
+                    fv.setReleaseDate(fixVer.getJSONObject(k).get(relDate).toString());
+                    fv.setName(fixVer.getJSONObject(k).get("name").toString());
+                }
+            }
+            JSONArray affVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("versions");
+            Version av = new Version();
+            av.setName(affVer.getJSONObject(0).get("name").toString());
+            av.setReleaseDate(affVer.getJSONObject(0).get(relDate).toString());
+            for(int k=1;k<affVer.length();k++){
+                if(av.getReleaseDate().before(new SimpleDateFormat("yyyy-MM-dd").parse(affVer.getJSONObject(k).get(relDate).toString()))){
+                    av.setReleaseDate(affVer.getJSONObject(k).get(relDate).toString());
+                    av.setName(affVer.getJSONObject(k).get("name").toString());
+                }
+            }
+            b.setAffectedVersion(av);
+            b.setFixedVersion(fv);
+            this.bugList.add(b);
+        }
+        return i;
     }
 
     private static void merge(List<Version> leftArr, List<Version> rightArr, List<Version> arr, Integer leftSize, Integer rightSize){
