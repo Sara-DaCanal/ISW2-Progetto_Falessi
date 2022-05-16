@@ -28,4 +28,8 @@ public class Version {
         return this.name;
     }
 
+    public boolean equals(Version v){
+        return this.name.equals(v.name);
+    }
+
 }

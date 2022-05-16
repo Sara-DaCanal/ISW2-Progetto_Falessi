@@ -35,7 +35,7 @@ public class CSVLine {
         this.buggy=false;
     }
 
-    public CSVLine(String version, String path, long size, int commitNumber, long loc[],  List<String> authNames){
+    public CSVLine(String version, String path, long size, int commitNumber, long[] loc,  List<String> authNames){
         this.version=version;
         this.path=path;
         this.size=size;
@@ -161,7 +161,7 @@ public class CSVLine {
         if(!this.version.contentEquals(l.version)) return false;
         else if(!this.path.contentEquals(l.path)) return false;
         else if(this.size != l.size) return false;
-        else return !(this.commitNumber!=l.commitNumber);
+        else return this.commitNumber==l.commitNumber;
 
     }
 

@@ -24,7 +24,6 @@ public class DiffList {
     private ParseJSON json;
     private List<Bug> bugList;
     private List<Version> versions;
-    private List<RevCommit> commit;
 
     public DiffList(List<RevCommit> commit, Git git, ParseJSON myJSON) throws IOException, ParseException {
         this.git=git;
@@ -32,7 +31,6 @@ public class DiffList {
         this.bugList=myJSON.getBugList();
         this.versions=myJSON.getVersionArray();
         this.map=new ArrayList<>();
-        this.commit=commit;
 
         int i=-1;
         int j=0;
@@ -54,13 +52,13 @@ public class DiffList {
                 AbstractTreeIterator oldTreeIterator = new EmptyTreeIterator();
                 if(i!=-1) oldTreeIterator = new CanonicalTreeParser(null, reader, oldCommit.getTree().getId());
                 AbstractTreeIterator newTreeIterator = new CanonicalTreeParser(null, reader, newCommit.getTree().getId());
-                try (DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
+                DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
                     diffFormatter.setRepository(git.getRepository());
                     this.diffEntries = diffFormatter.scan(oldTreeIterator, newTreeIterator);
                     for (DiffEntry entry : this.diffEntries) {
                         CSVLine l = path.pathContains(entry.getNewPath());
                         LOC locCounter;
-                        if(l!=null)locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), l.getSize());
+                        if(l!=null && !l.getVersion().equals(myV.getName()))locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), l.getSize());
                         else locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), 0);
                         long size = locCounter.getSize();
                         long locTouched = locCounter.getLOCTouched();
@@ -71,7 +69,7 @@ public class DiffList {
                         changeType(entry,newLine,oldLine,path);
                         labeling(bug, entry);
                     }
-                }
+
             }
             i++;
         }
@@ -83,11 +81,11 @@ public class DiffList {
             boolean in = false;
             for(int i=0; i<this.map.size(); i++){
                 if(map.get(i).getVersion().equals(bug.getAffectedVersion())) in = true;
-                if(map.get(i).getVersion().equals(bug.getAffectedVersion())) in=false;
-                if(in = true){
+                if(map.get(i).getVersion().equals(bug.getFixedVersion())) in=false;
+                if(in == true){
                     CSVLine l = map.get(i).pathContains(entry.getNewPath());
                     if(l!=null)
-                    l.setBuggy(true);
+                        l.setBuggy(true);
                 }
             }
         }
@@ -105,12 +103,10 @@ public class DiffList {
         if (entry.getChangeType() == DiffEntry.ChangeType.DELETE) {
             path.remove(oldLine);
         }
-        if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY) {
-            if(l!=null) {
-                changeLine(l,newLine);
-                if(!l.getVersion().equals(newLine.getVersion()))l.setCommitNumber(1);
-                else l.increaseCommit();
-            }
+        if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY && l!=null) {
+            changeLine(l,newLine);
+            if(!l.getVersion().equals(newLine.getVersion()))l.setCommitNumber(1);
+            else l.increaseCommit();
         }
     }
 

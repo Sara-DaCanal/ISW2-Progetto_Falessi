@@ -18,7 +18,7 @@ public class CSVList {
             CSVLine l = list.get(i);
             long[] loc = {l.getLocTouch(),l.getLocAdded(),l.getMaxLocAdded(),l.getMaxLocAdded(),l.getChurn(), l.getMaxChurn()
                     ,l.getAvgChurn()};
-            copy.add(new CSVLine(l.getVersion(),l.getPath(),l.getSize(),l.getCommitNumber(), loc, new ArrayList(l.getAuthNames())));
+            copy.add(new CSVLine(l.getVersion(),l.getPath(),l.getSize(),l.getCommitNumber(), loc, new ArrayList<String>(l.getAuthNames())));
         }
         copy.version=list.version;
         return copy;

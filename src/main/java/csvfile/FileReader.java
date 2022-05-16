@@ -11,11 +11,12 @@ import java.util.List;
 
 public class FileReader {
 
-    private static File table;
-    private static FileWriter tableWriter;
-    private static CSVWriter writer;
+
 
     public static void main(String[] arg) throws GitAPIException, IOException, JSONException, ParseException {
+        File table;
+        FileWriter tableWriter;
+        CSVWriter writer;
         ParseJSON myJson = new ParseJSON();
         myJson.setProjectName("BOOKKEEPER");
         CommitRetriever commitRetriever = new CommitRetriever("https://github.com/Sara-DaCanal/bookkeeper.git", myJson);
