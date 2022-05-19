@@ -20,6 +20,7 @@ public class ParseJSON {
     private List<Bug> bugList = new ArrayList<>();
     private String relDate = "releaseDate";
     private String rel = "released";
+    private String fields="fields";
 
 
     public void setProjectName(String name){
@@ -62,7 +63,6 @@ public class ParseJSON {
         int i=0;
         int j;
         int total;
-        String fields="fields";
 
         do {
             j=1000+i;
@@ -75,7 +75,6 @@ public class ParseJSON {
             total = json.getInt("total");
             for (; i < total && i < j; i++) {
                 String key = issues.getJSONObject(i % 1000).get("key").toString();
-                Bug b = new Bug(key);
                 JSONArray fixVer = issues.getJSONObject(i%1000).getJSONObject(fields).getJSONArray("fixVersions");
                 Version fv = new Version();
                 fv.setName(fixVer.getJSONObject(0).get("name").toString());
@@ -98,12 +97,12 @@ public class ParseJSON {
         Bug b = new Bug(key);
         if(fv.getReleaseDate()!=null) {
             if (av.getReleaseDate() == null || (av.getReleaseDate() != null && av.getReleaseDate().after(fv.getReleaseDate())))
-                av = proportion(fv, issues.getJSONObject(i % 1000).getJSONObject("fields").get("created").toString());
+                av = proportion(fv, issues.getJSONObject(i % 1000).getJSONObject(fields).get("created").toString());
             b.setAffectedVersion(av);
             b.setFixedVersion(fv);
             if(av!=null && av.getReleaseDate()!=null) {
                 this.bugList.add(b);
-                Proportion.setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(searchOv(issues.getJSONObject(i % 1000).getJSONObject("fields").get("created").toString()))+1);
+                Proportion.setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(searchOv(issues.getJSONObject(i % 1000).getJSONObject(fields).get("created").toString()))+1);
             }
         }
     }
