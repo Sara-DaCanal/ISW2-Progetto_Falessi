@@ -2,6 +2,7 @@ package csvfile;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Version{
@@ -29,7 +30,13 @@ public class Version{
     }
     @Override
     public boolean equals(Object v){
-        return this.name.equals(((Version) v).name);
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(this.releaseDate);
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(((Version)v).releaseDate);
+        return (calendar1.get(Calendar.DATE)==calendar2.get(Calendar.DATE) &&
+                calendar1.get(Calendar.YEAR)==calendar2.get(Calendar.YEAR) &&
+                calendar1.get(Calendar.MONTH)==calendar2.get(Calendar.MONTH));
     }
 
 }

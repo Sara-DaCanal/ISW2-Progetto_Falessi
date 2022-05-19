@@ -93,7 +93,6 @@ public class ParseJSON {
                     b.setFixedVersion(fv);
                     if(av!=null && av.getReleaseDate()!=null) {
                         this.bugList.add(b);
-                        System.out.println(av.getReleaseDate()+"---"+av.getName());
                         Proportion.setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(search_ov(issues.getJSONObject(i % 1000).getJSONObject("fields").get("created").toString()))+1);
                     }
                 }
@@ -118,10 +117,10 @@ public class ParseJSON {
         Version ov = search_ov(createDate);
         int ov_index = this.verList.indexOf(ov)+1;
         if(ov_index>fv_index) return null;
-        System.out.println(this.verList.size());
-        Version v = this.verList.get((int)(fv_index-(fv_index-ov_index)*p)-1);
-        System.out.println(this.verList.size());
-        return v;
+        long m = Math.round((fv_index-(fv_index-ov_index)*p)-1);
+        if(m>=0)
+            return this.verList.get((int)m);
+        return this.verList.get(0);
     }
 
     private Version search_ov(String createDate) throws ParseException {
