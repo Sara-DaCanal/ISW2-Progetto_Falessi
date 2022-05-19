@@ -18,9 +18,10 @@ public class FileReader {
         FileWriter tableWriter;
         CSVWriter writer;
         ParseJSON myJson = new ParseJSON();
-        myJson.setProjectName("SYNCOPE");
-        String url = "https://github.com/apache/syncope.git";
-        //String url = "https://github.com/Sara-DaCanal/bookkeeper.git";
+        myJson.setProjectName("BOOKKEEPER");
+        String url = "https://github.com/Sara-DaCanal/bookkeeper.git";
+        //String url = "https://github.com/apache/syncope.git";
+        //myJson.setProjectName("SYNCOPE");
         CommitRetriever commitRetriever = new CommitRetriever(url, myJson);
         DiffList diffList = new DiffList(commitRetriever.getCommit(),commitRetriever.getGit(),myJson);
         List<CSVList> map = diffList.getPath();
@@ -28,7 +29,7 @@ public class FileReader {
         tableWriter = new FileWriter(table);
         writer = new CSVWriter(tableWriter);
         String[] header = {"CSVFile.Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
-                "Churn", "Max churn", "Avg churn", "Authors numbers"};
+                "Churn", "Max churn", "Avg churn", "Authors numbers", "buggy"};
         writer.writeNext(header);
         for(int m=0; m<map.size(); m++) {
             for (int p = 0; p < map.get(m).size(); p++) {
