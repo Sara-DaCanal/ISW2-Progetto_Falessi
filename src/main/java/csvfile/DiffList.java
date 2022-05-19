@@ -28,8 +28,8 @@ public class DiffList {
     public DiffList(List<RevCommit> commit, Git git, ParseJSON myJSON) throws IOException, ParseException {
         this.git=git;
         this.json=myJSON;
-        this.bugList=myJSON.getBugList();
         this.versions=myJSON.getVersionArray();
+        this.bugList=myJSON.getBugList();
         this.map=new ArrayList<>();
 
         int i=-1;
@@ -81,8 +81,8 @@ public class DiffList {
             boolean in = false;
             for(int i=0; i<this.map.size(); i++){
                 CSVLine l = map.get(i).pathContains(entry.getNewPath());
-                if(map.get(i).getVersion().equalV(bug.getAffectedVersion())) in = true;
-                if(map.get(i).getVersion().equalV(bug.getFixedVersion())) in=false;
+                if(map.get(i).getVersion().equals(bug.getAffectedVersion())) in = true;
+                if(map.get(i).getVersion().equals(bug.getFixedVersion())) in=false;
                 if(in && l!=null){
                     l.setBuggy(true);
                 }

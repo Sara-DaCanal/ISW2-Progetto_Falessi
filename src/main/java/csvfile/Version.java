@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Version {
+public class Version{
     private Date releaseDate;
     private String name="";
 
@@ -27,9 +27,9 @@ public class Version {
     public String getName(){
         return this.name;
     }
-
-    public boolean equalV(Version v){
-        return this.name.equals(v.name);
+    @Override
+    public boolean equals(Object v){
+        return this.name.equals(((Version) v).name);
     }
 
 }

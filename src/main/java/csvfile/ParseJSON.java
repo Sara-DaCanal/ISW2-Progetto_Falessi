@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ParseJSON {
@@ -65,8 +66,8 @@ public class ParseJSON {
         do {
             j=1000+i;
             String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22"
-                    + this.projectName + "%22AND%22issueType%22=%22Bug%22AND%20affectedVersion%20is%20not%20EMPTY%20AND%20fixVersion%20is%20not%20EMPTY%20AND(%22status%22=%22closed%22OR"
-                    + "%22status%22=%22resolved%22)AND%22resolution%22=%22fixed%22&fields=key,fixVersions,versions&created&startAt="
+                    + this.projectName + "%22AND%22issueType%22=%22Bug%22AND%20fixVersion%20is%20not%20EMPTY%20AND(%22status%22=%22closed%22OR"
+                    + "%22status%22=%22resolved%22)AND%22resolution%22=%22fixed%22&fields=key,created,fixVersions,versions&created&startAt="
                     + 0 + "&maxResults=" + 1000;
             JSONObject json = readJsonFromUrl(url);
             JSONArray issues = json.getJSONArray("issues");
@@ -81,12 +82,21 @@ public class ParseJSON {
                 iterate(fixVer,fv);
                 JSONArray affVer = issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("versions");
                 Version av = new Version();
-                av.setName(affVer.getJSONObject(0).get("name").toString());
+                if(affVer.length()!=0) {av.setName(affVer.getJSONObject(0).get("name").toString());
                 if(affVer.getJSONObject(0).get(rel).toString().equals("true")) av.setReleaseDate(affVer.getJSONObject(0).get(relDate).toString());
-                iterate(affVer, av);
-                b.setAffectedVersion(av);
-                b.setFixedVersion(fv);
-                if(fv.getReleaseDate()!=null && av.getReleaseDate()!=null) this.bugList.add(b);
+                iterate(affVer, av);}
+
+                if(fv.getReleaseDate()!=null) {
+                    if (av.getReleaseDate() == null || (av.getReleaseDate() != null && av.getReleaseDate().after(fv.getReleaseDate())))
+                        av = proportion(fv, issues.getJSONObject(i % 1000).getJSONObject("fields").get("created").toString());
+                    b.setAffectedVersion(av);
+                    b.setFixedVersion(fv);
+                    if(av!=null && av.getReleaseDate()!=null) {
+                        this.bugList.add(b);
+                        System.out.println(av.getReleaseDate()+"---"+av.getName());
+                        Proportion.setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(search_ov(issues.getJSONObject(i % 1000).getJSONObject("fields").get("created").toString()))+1);
+                    }
+                }
             }
         }while(i<total);
 
@@ -100,6 +110,28 @@ public class ParseJSON {
                 v.setName(ver.getJSONObject(k).get("name").toString());
             }
         }
+    }
+
+    private Version proportion(Version fv, String createDate) throws ParseException {
+        double p=Proportion.getP();
+        int fv_index = this.verList.indexOf(fv)+1;
+        Version ov = search_ov(createDate);
+        int ov_index = this.verList.indexOf(ov)+1;
+        if(ov_index>fv_index) return null;
+        System.out.println(this.verList.size());
+        Version v = this.verList.get((int)(fv_index-(fv_index-ov_index)*p)-1);
+        System.out.println(this.verList.size());
+        return v;
+    }
+
+    private Version search_ov(String createDate) throws ParseException {
+        Date ov_date = new SimpleDateFormat("yyyy-MM-dd").parse(createDate);
+        for(int i=0; i< verList.size(); i++){
+            if(verList.get(i).getReleaseDate().after(ov_date)){
+                return verList.get(i);
+            }
+        }
+        return null;
     }
 
     private static void merge(List<Version> leftArr, List<Version> rightArr, List<Version> arr, Integer leftSize, Integer rightSize){
