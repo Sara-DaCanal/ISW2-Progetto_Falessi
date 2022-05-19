@@ -30,6 +30,8 @@ public class Version{
     }
     @Override
     public boolean equals(Object v){
+        if(v==null) return false;
+        if(v.getClass()!= this.getClass()) return false;
         Calendar calendar1 = Calendar.getInstance();
         calendar1.setTime(this.releaseDate);
         Calendar calendar2 = Calendar.getInstance();
@@ -37,6 +39,10 @@ public class Version{
         return (calendar1.get(Calendar.DATE)==calendar2.get(Calendar.DATE) &&
                 calendar1.get(Calendar.YEAR)==calendar2.get(Calendar.YEAR) &&
                 calendar1.get(Calendar.MONTH)==calendar2.get(Calendar.MONTH));
+    }
+    @Override
+    public int hashCode(){
+        return this.hashCode();
     }
 
 }

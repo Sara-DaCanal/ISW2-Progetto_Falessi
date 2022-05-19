@@ -7,7 +7,7 @@ public class Proportion {
     public static void setP(int fv, int iv, int ov){
         if(iv<fv && ov<fv){
         n++;
-        p=((n-1)*p+(fv-iv)/(fv-ov))/n;
+        p=((n-1)*p+(double)(fv-iv)/(fv-ov))/n;
         }
     }
 
