@@ -86,21 +86,26 @@ public class ParseJSON {
                 if(affVer.length()!=0) {av.setName(affVer.getJSONObject(0).get("name").toString());
                 if(affVer.getJSONObject(0).get(rel).toString().equals("true")) av.setReleaseDate(affVer.getJSONObject(0).get(relDate).toString());
                 iterate(affVer, av);}
+                conclusion(fv, av, key, issues, i);
 
-                if(fv.getReleaseDate()!=null) {
-                    if (av.getReleaseDate() == null || (av.getReleaseDate() != null && av.getReleaseDate().after(fv.getReleaseDate())))
-                        av = proportion(fv, issues.getJSONObject(i % 1000).getJSONObject(fields).get("created").toString());
-                    b.setAffectedVersion(av);
-                    b.setFixedVersion(fv);
-                    if(av!=null && av.getReleaseDate()!=null) {
-                        this.bugList.add(b);
-                        Proportion.setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(search_ov(issues.getJSONObject(i % 1000).getJSONObject(fields).get("created").toString()))+1);
-                    }
-                }
             }
         }while(i<total);
 
         return this.bugList;
+    }
+
+    private void conclusion(Version fv, Version av, String key, JSONArray issues, int i) throws ParseException {
+        Bug b = new Bug(key);
+        if(fv.getReleaseDate()!=null) {
+            if (av.getReleaseDate() == null || (av.getReleaseDate() != null && av.getReleaseDate().after(fv.getReleaseDate())))
+                av = proportion(fv, issues.getJSONObject(i % 1000).getJSONObject("fields").get("created").toString());
+            b.setAffectedVersion(av);
+            b.setFixedVersion(fv);
+            if(av!=null && av.getReleaseDate()!=null) {
+                this.bugList.add(b);
+                Proportion.setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(searchOv(issues.getJSONObject(i % 1000).getJSONObject("fields").get("created").toString()))+1);
+            }
+        }
     }
 
     private void iterate(JSONArray ver, Version v) throws ParseException {
@@ -115,7 +120,7 @@ public class ParseJSON {
     private Version proportion(Version fv, String createDate) throws ParseException {
         double p=Proportion.getP();
         int fvIndex = this.verList.indexOf(fv)+1;
-        Version ov = search_ov(createDate);
+        Version ov = searchOv(createDate);
         int ovIndex = this.verList.indexOf(ov)+1;
         if(ovIndex>fvIndex) return null;
         long m = Math.round((fvIndex-(fvIndex-ovIndex)*p)-1);
@@ -124,10 +129,10 @@ public class ParseJSON {
         return this.verList.get(0);
     }
 
-    private Version search_ov(String createDate) throws ParseException {
-        Date ov_date = new SimpleDateFormat("yyyy-MM-dd").parse(createDate);
+    private Version searchOv(String createDate) throws ParseException {
+        Date ovDate = new SimpleDateFormat("yyyy-MM-dd").parse(createDate);
         for(int i=0; i< verList.size(); i++){
-            if(verList.get(i).getReleaseDate().after(ov_date)){
+            if(verList.get(i).getReleaseDate().after(ovDate)){
                 return verList.get(i);
             }
         }
