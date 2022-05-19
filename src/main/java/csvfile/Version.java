@@ -42,7 +42,7 @@ public class Version{
     }
     @Override
     public int hashCode(){
-        return this.hashCode();
+        return this.releaseDate.hashCode();
     }
 
 }
