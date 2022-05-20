@@ -31,7 +31,7 @@ public class FileReader {
         String[] header = {"CSVFile.Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
                 "Churn", "Max churn", "Avg churn", "Authors numbers", "buggy"};
         writer.writeNext(header);
-        for(int m=0; m<map.size(); m++) {
+        for(int m=0; m<map.size()/2; m++) {
             for (int p = 0; p < map.get(m).size(); p++) {
                 CSVLine line = map.get(m).get(p);
                 if (!line.getVersion().equals(map.get(m).getVersion().getName()))
