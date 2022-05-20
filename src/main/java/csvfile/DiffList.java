@@ -82,7 +82,7 @@ public class DiffList {
             for(int i=0; i<this.map.size(); i++){
                 CSVLine l = map.get(i).pathContains(entry.getNewPath());
                 if(map.get(i).getVersion().equals(bug.getAffectedVersion())) in = true;
-                if(map.get(i).getVersion().equals(bug.getFixedVersion())) in=false;
+                if(map.get(i).getVersion().equals(bug.getFixedVersion()) || map.get(i).getVersion().getReleaseDate().after(bug.getFixedVersion().getReleaseDate())) in=false;
                 if(in && l!=null){
                     l.setBuggy(true);
                 }
