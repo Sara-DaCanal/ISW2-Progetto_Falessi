@@ -9,15 +9,16 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class ParseJSON {
 
-    private List<Version> verList = new ArrayList<>();
+    private List<Version> verList ;
     private String projectName;
-    private List<Bug> bugList = new ArrayList<>();
+    private List<Bug> bugList;
     private String relDate = "releaseDate";
     private String rel = "released";
     private String fields="fields";
@@ -29,7 +30,7 @@ public class ParseJSON {
     public String getProjectName(){ return this.projectName; }
 
     public List<Version> getVersionArray() throws JSONException, ParseException, IOException {
-
+        verList=new ArrayList<>();
         int total;
         int j;
         int i=0;
@@ -52,6 +53,7 @@ public class ParseJSON {
                 }
             }
         }while (i < total);
+        verList.add(new Version("9.9.9", Date.from(Instant.now())));
         Integer length=this.verList.size();
         mergeSort(this.verList, length);
         return this.verList;
@@ -63,7 +65,7 @@ public class ParseJSON {
         int i=0;
         int j;
         int total;
-
+        bugList=new ArrayList<>();
         do {
             j=1000+i;
             String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22"
@@ -102,7 +104,7 @@ public class ParseJSON {
             b.setFixedVersion(fv);
             if(av!=null && av.getReleaseDate()!=null) {
                 this.bugList.add(b);
-                Proportion.setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(searchOv(issues.getJSONObject(i % 1000).getJSONObject(fields).get("created").toString()))+1);
+                Proportion.getProportion().setP(this.verList.indexOf(fv)+1, this.verList.indexOf(av)+1, this.verList.indexOf(searchOv(issues.getJSONObject(i % 1000).getJSONObject(fields).get("created").toString()))+1);
             }
         }
     }
@@ -117,7 +119,7 @@ public class ParseJSON {
     }
 
     private Version proportion(Version fv, String createDate) throws ParseException {
-        double p=Proportion.getP();
+        double p=Proportion.getProportion().getP();
         int fvIndex = this.verList.indexOf(fv)+1;
         Version ov = searchOv(createDate);
         int ovIndex = this.verList.indexOf(ov)+1;

@@ -1,21 +1,29 @@
 package csvfile;
 
 public class Proportion {
-    private static double p=0.0;
-    private static int n=0;
+    private static Proportion me=null;
+    private static double p;
+    private static int n;
 
     private Proportion(){
-        throw new IllegalStateException("Utility class");
+        p=0.0;
+        n=0;
     }
 
-    public static void setP(int fv, int iv, int ov){
-        if(iv<fv && ov<fv){
+    public void setP(int fv, int iv, int ov){
         n++;
-        p=((n-1)*p+(double)(fv-iv)/(fv-ov))/n;
+        if(iv<fv && ov<fv){
+            p= p + (double)(fv-iv)/(fv-ov);
         }
     }
 
-    public static double getP(){
-        return p;
+    public double getP(){
+        if(n==0) return 0;
+        return p/n;
+    }
+
+    public static Proportion getProportion(){
+        if(me == null) me= new Proportion();
+       return me;
     }
 }

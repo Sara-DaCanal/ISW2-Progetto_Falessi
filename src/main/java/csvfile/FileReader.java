@@ -19,7 +19,7 @@ public class FileReader {
         CSVWriter writer;
         ParseJSON myJson = new ParseJSON();
         myJson.setProjectName("BOOKKEEPER");
-        String url = "https://github.com/Sara-DaCanal/bookkeeper.git";
+        String url = "https://github.com/apache/bookkeeper.git";
         //String url = "https://github.com/apache/syncope.git";
         //myJson.setProjectName("SYNCOPE");
         CommitRetriever commitRetriever = new CommitRetriever(url, myJson);
@@ -31,6 +31,7 @@ public class FileReader {
         String[] header = {"CSVFile.Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
                 "Churn", "Max churn", "Avg churn", "Authors numbers", "buggy"};
         writer.writeNext(header);
+
         for(int m=0; m<map.size()/2; m++) {
             for (int p = 0; p < map.get(m).size(); p++) {
                 CSVLine line = map.get(m).get(p);

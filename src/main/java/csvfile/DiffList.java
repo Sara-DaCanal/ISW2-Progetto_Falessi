@@ -31,20 +31,21 @@ public class DiffList {
         this.versions=myJSON.getVersionArray();
         this.bugList=myJSON.getBugList();
         this.map=new ArrayList<>();
-
         int i=-1;
         int j=0;
         RevCommit oldCommit=null;
         Version myV = versions.get(0);
         CSVList path = new CSVList();
         path.setVersion(myV);
-        while( i< commit.size() && j < versions.size()-1) {
+        while( i< commit.size()-1 && j < versions.size()) {
             if(i!=-1) oldCommit = commit.get(i);
             RevCommit newCommit = commit.get(i+1);
-            if(new Date((newCommit.getCommitTime()*1000L)).after(myV.getReleaseDate())) {
+            if(new Date((newCommit.getCommitTime()*1000L)).after(myV.getReleaseDate()) || (i+1)==commit.size()-1) {
                 this.map.add(CSVList.copyOf(path));
-                myV=versions.get(++j);
-                path.setVersion(myV);
+                j++;
+                if(j < versions.size()){ myV=versions.get(j);
+                path.setVersion(myV);}
+                else return;
             }
             String authName = newCommit.getAuthorIdent().getName();
             Bug bug = searchBug(newCommit);
@@ -80,7 +81,7 @@ public class DiffList {
         if(bug!=null){
             boolean in = false;
             for(int i=0; i<this.map.size(); i++){
-                CSVLine l = map.get(i).pathContains(entry.getNewPath());
+                CSVLine l = map.get(i).pathContains(entry.getOldPath());
                 if(map.get(i).getVersion().equals(bug.getAffectedVersion())) in = true;
                 if(map.get(i).getVersion().equals(bug.getFixedVersion()) || map.get(i).getVersion().getReleaseDate().after(bug.getFixedVersion().getReleaseDate())) in=false;
                 if(in && l!=null){
@@ -93,7 +94,7 @@ public class DiffList {
     private void changeType(DiffEntry entry, CSVLine newLine, CSVLine oldLine, CSVList path){
         CSVLine l = path.pathContains(entry.getNewPath());
         if (entry.getChangeType() == DiffEntry.ChangeType.ADD) {
-            if(l==null && entry.getNewPath().endsWith(".java"))
+            if(l==null && entry.getNewPath().endsWith(".java") && !entry.getNewPath().contains("/test/"))
                 path.add(newLine);
             else if(l!=null) {
                 changeLine(l,newLine);
