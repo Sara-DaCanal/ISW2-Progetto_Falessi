@@ -58,9 +58,7 @@ public class DiffList {
                     this.diffEntries = diffFormatter.scan(oldTreeIterator, newTreeIterator);
                     for (DiffEntry entry : this.diffEntries) {
                         CSVLine l = path.pathContains(entry.getNewPath());
-                        LOC locCounter;
-                        if(l!=null && !l.getVersion().equals(myV.getName()))locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), l.getSize());
-                        else locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), 0);
+                        LOC locCounter=locCounterGenerator(l, entry, myV, diffFormatter);
                         long size = locCounter.getSize();
                         long locTouched = locCounter.getLOCTouched();
                         long locAdded = locCounter.getLOCAdded();
@@ -75,6 +73,13 @@ public class DiffList {
             i++;
         }
 
+    }
+
+    public LOC locCounterGenerator(CSVLine l, DiffEntry entry, Version myV, DiffFormatter diffFormatter) throws IOException {
+        LOC locCounter;
+        if(l!=null && !l.getVersion().equals(myV.getName()))locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), l.getSize());
+        else locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), 0);
+        return locCounter;
     }
 
     public void labeling(Bug bug, DiffEntry entry){

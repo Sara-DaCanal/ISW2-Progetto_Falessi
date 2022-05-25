@@ -2,8 +2,8 @@ package csvfile;
 
 public class Proportion {
     private static Proportion me=null;
-    private static double p;
-    private static int n;
+    private double p;
+    private int n;
 
     private Proportion(){
         p=0.0;
