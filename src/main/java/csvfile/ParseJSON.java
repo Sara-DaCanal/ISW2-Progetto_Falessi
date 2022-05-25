@@ -43,7 +43,6 @@ public class ParseJSON {
             JSONArray values = json.getJSONArray("values");
             total = json.getInt("total");
             for (; i < total && i < j; i++) {
-                //Iterate through each bug
                 JSONObject ver = values.getJSONObject(i % 1000);
                 if (!ver.isEmpty() && ver.get(rel).toString().contentEquals( "true")) {
                     Version y = new Version();
