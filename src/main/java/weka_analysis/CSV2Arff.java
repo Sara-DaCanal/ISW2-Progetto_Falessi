@@ -1,23 +1,19 @@
 package weka_analysis;
 
 import com.opencsv.CSVReader;
-import csvfile.CSVList;
 import weka.core.converters.ArffSaver;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 
 public class CSV2Arff {
 
     private String fileName;
-    private List<CSVList> map;
 
-    public CSV2Arff(String fileName, List<CSVList> map){
+    public CSV2Arff(String fileName){
         this.fileName=fileName;
-        this.map=map;
     }
 
     public String converter() throws IOException {
@@ -55,16 +51,19 @@ public class CSV2Arff {
         writer.write("@data");
         writer.newLine();
 
-        CSVReader csvReader = new CSVReader(new FileReader(fileName));
-        String[] line;
-        while ((line = csvReader.readNext())!=null){
-            String s = line[2];
-            for(int i=3; i<line.length; i++)  s = s+","+line[i];
-            writer.write(s);
-            writer.newLine();
+        try(CSVReader csvReader = new CSVReader(new FileReader(fileName))) {
+            String[] line;
+            csvReader.readNext();
+            while ((line = csvReader.readNext()) != null) {
+                StringBuilder bld = new StringBuilder();
+                bld.append(line[2]);
+                for (int i = 3; i < line.length; i++) bld.append("," + line[i]);
+                writer.write(bld.toString());
+                writer.newLine();
+            }
         }
-
-        writer.close();
+            writer.flush();
+            writer.close();
         // load CSV
         return arffPath;
     }

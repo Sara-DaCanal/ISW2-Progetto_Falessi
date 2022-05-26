@@ -95,7 +95,7 @@ public class DiffList {
         File newFile = new File(path);
         FileWriter fileWriter = new FileWriter(newFile);
         CSVWriter writer = new CSVWriter(fileWriter);
-        String header[] = {"CSVFile.Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
+        String[] header = {"CSVFile.Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
                 "Churn", "Max churn", "Avg churn", "Authors numbers", "buggy"};
         writer.writeNext(header);
         for(int i=0; i<map.size(); i++) {

@@ -41,11 +41,11 @@ public class WekaParameters {
 
             String testPath = TestingSet.getInstance(projectName.toLowerCase(Locale.ROOT), map).testingSetCreator();
 
-            String testArffFile = new CSV2Arff(testPath, map).converter();
+            String testArffFile = new CSV2Arff(testPath).converter();
 
             String trainingPath = "./training_" + projectName.toLowerCase(Locale.ROOT) + "_"+(i + 1) + ".csv";
 
-            String trainingArffFile = new CSV2Arff(trainingPath, map).converter();
+            String trainingArffFile = new CSV2Arff(trainingPath).converter();
 
             DataSource source1 = new DataSource(trainingArffFile);
             Instances training = source1.getDataSet();
@@ -80,10 +80,10 @@ public class WekaParameters {
         arr1.add(projectName);
         arr1.add(Integer.toString(i+1));
         arr1.add(class_name);
-        arr1.add(Double.toString(Math.round(eval.precision(1)*10000)/10000d));
-        arr1.add(Double.toString(Math.round(eval.recall(1)*10000)/10000d));
-        arr1.add(Double.toString(Math.round(eval.areaUnderROC(1)*10000)/10000d));
-        arr1.add(Double.toString(Math.round(eval.kappa()*10000)/10000d));
+        arr1.add(Double.toString(Math.round(eval.precision(1)*100)/100d));
+        arr1.add(Double.toString(Math.round(eval.recall(1)*100)/100d));
+        arr1.add(Double.toString(Math.round(eval.areaUnderROC(1)*100)/100d));
+        arr1.add(Double.toString(Math.round(eval.kappa()*100)/100d));
 
         results.add(new ArrayList<>(arr1));
     }
@@ -99,6 +99,7 @@ public class WekaParameters {
             String[] a = {arr.get(0), arr.get(1), arr.get(2), arr.get(3), arr.get(4), arr.get(5), arr.get(6)};
             writer.writeNext(a);
         }
+        writer.flush();
         writer.close();
     }
 
