@@ -97,8 +97,9 @@ public class ParseJSON {
     private void conclusion(Version fv, Version av, String key, JSONArray issues, int i) throws ParseException {
         Bug b = new Bug(key);
         if(fv.getReleaseDate()!=null) {
-            if (av.getReleaseDate() == null || (av.getReleaseDate() != null && av.getReleaseDate().after(fv.getReleaseDate())))
+            if (av.getReleaseDate() == null || (av.getReleaseDate() != null && av.getReleaseDate().after(fv.getReleaseDate()))) {
                 av = proportion(fv, issues.getJSONObject(i % 1000).getJSONObject(fields).get("created").toString());
+            }
             b.setAffectedVersion(av);
             b.setFixedVersion(fv);
             if(av!=null && av.getReleaseDate()!=null) {

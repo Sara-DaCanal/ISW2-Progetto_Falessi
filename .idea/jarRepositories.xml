@@ -7,6 +7,11 @@
       <option name="url" value="https://repo.maven.apache.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="cee078c3-2d55-4853-8e7e-b7914a2bd58a" />
+      <option name="name" value="cee078c3-2d55-4853-8e7e-b7914a2bd58a" />
+      <option name="url" value="https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Maven Central repository" />
       <option name="url" value="https://repo1.maven.org/maven2" />

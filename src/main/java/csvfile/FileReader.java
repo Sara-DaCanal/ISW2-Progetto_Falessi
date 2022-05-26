@@ -1,27 +1,25 @@
 package csvfile;
 
 import com.opencsv.CSVWriter;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.json.JSONException;
-import java.io.*;
-import java.text.ParseException;
-import java.util.List;
+import wekaAnalysis.WekaParameters;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.util.List;
+import java.util.Locale;
 
 
 public class FileReader {
 
 
 
-    public static void main(String[] arg) throws GitAPIException, IOException, JSONException, ParseException {
+    public static void main(String[] arg) throws Exception {
         File table;
         FileWriter tableWriter;
         CSVWriter writer;
         ParseJSON myJson = new ParseJSON();
-        myJson.setProjectName("BOOKKEEPER");
-        String url = "https://github.com/apache/bookkeeper.git";
-        //String url = "https://github.com/apache/syncope.git";
-        //myJson.setProjectName("SYNCOPE");
+        myJson.setProjectName(arg[0].toUpperCase(Locale.ROOT));
+        String url = "https://github.com/apache/"+arg[0].toLowerCase()+".git";
         CommitRetriever commitRetriever = new CommitRetriever(url, myJson);
         DiffList diffList = new DiffList(commitRetriever.getCommit(),commitRetriever.getGit(),myJson);
         List<CSVList> map = diffList.getPath();
@@ -42,6 +40,10 @@ public class FileReader {
             }
         }
         writer.close();
+
+        WekaParameters myWeka = new WekaParameters(myJson.getProjectName(), map);
+        myWeka.wekaAnalysis();
+        myWeka.writeOutput2();
     }
 
 }

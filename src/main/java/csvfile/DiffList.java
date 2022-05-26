@@ -1,5 +1,6 @@
 package csvfile;
 
+import com.opencsv.CSVWriter;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -9,11 +10,15 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +47,9 @@ public class DiffList {
             RevCommit newCommit = commit.get(i+1);
             if(new Date((newCommit.getCommitTime()*1000L)).after(myV.getReleaseDate()) || (i+1)==commit.size()-1) {
                 this.map.add(CSVList.copyOf(path));
+                if(j<versions.size()/2-1){
+                    newCSVFile(map, j);
+                }
                 j++;
                 if(j < versions.size()){ myV=versions.get(j);
                 path.setVersion(myV);}
@@ -80,6 +88,24 @@ public class DiffList {
         if(l!=null && !l.getVersion().equals(myV.getName()))locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), l.getSize());
         else locCounter = new LOC(diffFormatter.toFileHeader(entry).toEditList(), 0);
         return locCounter;
+    }
+
+    private void newCSVFile(List<CSVList> map, int j) throws IOException {
+        String path = "./training_"+this.json.getProjectName().toLowerCase(Locale.ROOT)+"_"+j+".csv";
+        File newFile = new File(path);
+        FileWriter fileWriter = new FileWriter(newFile);
+        CSVWriter writer = new CSVWriter(fileWriter);
+        String header[] = {"CSVFile.Version", "File", "Size", "Commit number", "Loc touched", "Loc added", "Max loc added", "Avg loc added",
+                "Churn", "Max churn", "Avg churn", "Authors numbers", "buggy"};
+        writer.writeNext(header);
+        for(int i=0; i<map.size(); i++) {
+            for (int k = 0; k < map.get(i).size(); k++) {
+                CSVLine line = map.get(i).get(k);
+                if (!line.getVersion().equals(map.get(i).getVersion().getName()))
+                    line.setVersion(map.get(i).getVersion().getName());
+                writer.writeNext(line.toStringArray());
+            }
+        }writer.close();
     }
 
     public void labeling(Bug bug, DiffEntry entry){
