@@ -1,4 +1,4 @@
-package wekaAnalysis;
+package weka_analysis;
 
 import com.opencsv.CSVWriter;
 import csvfile.CSVList;

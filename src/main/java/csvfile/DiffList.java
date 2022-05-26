@@ -91,7 +91,7 @@ public class DiffList {
     }
 
     private void newCSVFile(List<CSVList> map, int j) throws IOException {
-        String path = "./training_"+this.json.getProjectName().toLowerCase(Locale.ROOT)+"_"+j+".csv";
+        String path = "./training_"+this.json.getProjectName().toLowerCase(Locale.ROOT)+"_"+(j+1)+".csv";
         File newFile = new File(path);
         FileWriter fileWriter = new FileWriter(newFile);
         CSVWriter writer = new CSVWriter(fileWriter);

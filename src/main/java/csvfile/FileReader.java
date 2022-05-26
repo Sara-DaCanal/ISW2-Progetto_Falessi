@@ -1,7 +1,7 @@
 package csvfile;
 
 import com.opencsv.CSVWriter;
-import wekaAnalysis.WekaParameters;
+import weka_analysis.WekaParameters;
 
 import java.io.File;
 import java.io.FileWriter;
