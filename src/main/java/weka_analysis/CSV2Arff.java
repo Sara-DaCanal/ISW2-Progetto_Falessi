@@ -23,6 +23,19 @@ public class CSV2Arff {
         String arffPath = fileName.substring(0, fileName.lastIndexOf("."))+".arff";
         saver.setFile(new File(arffPath));
         BufferedWriter writer = saver.getWriter();
+        String[] attributes = {
+                "@relation " + fileName.substring(2, fileName.lastIndexOf(".")),
+                "@attribute size numeric",
+                "@attribute commit_number numeric",
+                "@attribute loc_touched numeric",
+                "@attribute loc_added numeric",
+                "@attribute max_loc_added numeric",
+                "@attribute avg_loc_added numeric",
+                "@attribute churn numeric",
+                "@attribute max_churn numeric",
+                "@attribute auth_number numeric",
+                "@attribute class {true, false}"
+        };
         writer.write("@relation " + fileName.substring(2, fileName.lastIndexOf(".")));
         writer.newLine();
         writer.write("@attribute size numeric");

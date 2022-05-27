@@ -47,9 +47,7 @@ public class DiffList {
             RevCommit newCommit = commit.get(i+1);
             if(new Date((newCommit.getCommitTime()*1000L)).after(myV.getReleaseDate()) || (i+1)==commit.size()-1) {
                 this.map.add(CSVList.copyOf(path));
-                if(j<versions.size()/2-1){
-                    newCSVFile(map, j);
-                }
+                newCSVFile(map, j);
                 j++;
                 if(j < versions.size()){ myV=versions.get(j);
                 path.setVersion(myV);}
@@ -91,6 +89,7 @@ public class DiffList {
     }
 
     private void newCSVFile(List<CSVList> map, int j) throws IOException {
+        if(j>=versions.size()/2-1) return;
         String path = "./training_"+this.json.getProjectName().toLowerCase(Locale.ROOT)+"_"+(j+1)+".csv";
         File newFile = new File(path);
         FileWriter fileWriter = new FileWriter(newFile);

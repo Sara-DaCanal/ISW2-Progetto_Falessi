@@ -68,7 +68,7 @@ public class WekaParameters {
         }
     }
 
-    private void evalModel(Instances training, Instances testing, Classifier classifier, double[] arr, String class_name, int i) throws Exception {
+    private void evalModel(Instances training, Instances testing, Classifier classifier, double[] arr, String className, int i) throws Exception {
         Evaluation eval = new Evaluation(testing);
         classifier.buildClassifier(training);
         eval.evaluateModel(classifier, testing);
@@ -79,7 +79,7 @@ public class WekaParameters {
         arr[3] += eval.kappa();
         arr1.add(projectName);
         arr1.add(Integer.toString(i+1));
-        arr1.add(class_name);
+        arr1.add(className);
         arr1.add(Double.toString(Math.round(eval.precision(1)*100)/100d));
         arr1.add(Double.toString(Math.round(eval.recall(1)*100)/100d));
         arr1.add(Double.toString(Math.round(eval.areaUnderROC(1)*100)/100d));
@@ -91,16 +91,16 @@ public class WekaParameters {
     public void writeOutput2() throws IOException {
         File file = new File("./results_"+projectName.toLowerCase(Locale.ROOT)+".csv");
         FileWriter fileWriter = new FileWriter(file);
-        CSVWriter writer = new CSVWriter(fileWriter);
+        try(CSVWriter writer = new CSVWriter(fileWriter)){
 
-        String[] header = {"Dataset", "#trainingReleases", "Classifier", "precision", "recall", "AUC", "kappa"};
-        writer.writeNext(header);
-        for(List<String> arr: results){
-            String[] a = {arr.get(0), arr.get(1), arr.get(2), arr.get(3), arr.get(4), arr.get(5), arr.get(6)};
-            writer.writeNext(a);
+            String[] header = {"Dataset", "#trainingReleases", "Classifier", "precision", "recall", "AUC", "kappa"};
+            writer.writeNext(header);
+            for(List<String> arr: results){
+                String[] a = {arr.get(0), arr.get(1), arr.get(2), arr.get(3), arr.get(4), arr.get(5), arr.get(6)};
+                writer.writeNext(a);
+            }
+            writer.flush();
         }
-        writer.flush();
-        writer.close();
     }
 
 }
