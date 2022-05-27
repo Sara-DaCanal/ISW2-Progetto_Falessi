@@ -20,7 +20,7 @@ public class TestingSet {
     }
 
     public String testingSetCreator() throws IOException {
-        String path = "./test_"+projectName+"_"+index+".csv";
+        String path = "./file_"+projectName+"/test_"+projectName+"_"+index+".csv";
         File newFile = new File(path);
         FileWriter fileWriter = new FileWriter(newFile);
         CSVWriter writer = new CSVWriter(fileWriter);

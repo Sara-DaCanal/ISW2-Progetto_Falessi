@@ -43,7 +43,6 @@ public class FileReader {
 
         WekaParameters myWeka = new WekaParameters(myJson.getProjectName(), map);
         myWeka.wekaAnalysis();
-        myWeka.writeOutput2();
     }
 
 }

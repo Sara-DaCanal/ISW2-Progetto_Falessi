@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class WekaParameters {
 
@@ -39,11 +38,11 @@ public class WekaParameters {
 
         for (int i = 0; i < releaseNumber - 1; i++) {
 
-            String testPath = TestingSet.getInstance(projectName.toLowerCase(Locale.ROOT), map).testingSetCreator();
+            String testPath = TestingSet.getInstance(projectName.toLowerCase(), map).testingSetCreator();
 
             String testArffFile = new CSV2Arff(testPath).converter();
 
-            String trainingPath = "./training_" + projectName.toLowerCase(Locale.ROOT) + "_"+(i + 1) + ".csv";
+            String trainingPath = "./file_"+projectName.toLowerCase()+"/training_" + projectName.toLowerCase() + "_"+(i + 1) + ".csv";
 
             String trainingArffFile = new CSV2Arff(trainingPath).converter();
 
@@ -62,10 +61,14 @@ public class WekaParameters {
             NaiveBayes classifier2 = new NaiveBayes();
             evalModel(training, testing, classifier2, naiveBayes, "Naive Bayes", i);
 
-
             IBk classifier3 = new IBk();
             evalModel(training, testing, classifier3, ibk, "IBk", i);
+
         }
+        meanValues("Random Forest", randomForest);
+        meanValues("Naive Bayes", naiveBayes);
+        meanValues("Ibk", ibk);
+        writeOutput2();
     }
 
     private void evalModel(Instances training, Instances testing, Classifier classifier, double[] arr, String className, int i) throws Exception {
@@ -88,8 +91,17 @@ public class WekaParameters {
         results.add(new ArrayList<>(arr1));
     }
 
-    public void writeOutput2() throws IOException {
-        File file = new File("./results_"+projectName.toLowerCase(Locale.ROOT)+".csv");
+    private void meanValues(String className, double[] arr){
+        List<String> arr1 = new ArrayList<>();
+        arr1.add(projectName);
+        arr1.add("MEDIA");
+        arr1.add(className);
+        for(double d: arr) arr1.add(Double.toString(Math.round(d/releaseNumber*100)/100d));
+        results.add(new ArrayList<>(arr1));
+    }
+
+    private void writeOutput2() throws IOException {
+        File file = new File("./file_"+projectName.toLowerCase()+"/results_"+projectName.toLowerCase()+".csv");
         FileWriter fileWriter = new FileWriter(file);
         try(CSVWriter writer = new CSVWriter(fileWriter)){
 

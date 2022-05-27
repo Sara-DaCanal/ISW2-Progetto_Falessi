@@ -18,7 +18,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,7 +89,7 @@ public class DiffList {
 
     private void newCSVFile(List<CSVList> map, int j) throws IOException {
         if(j>=versions.size()/2-1) return;
-        String path = "./training_"+this.json.getProjectName().toLowerCase(Locale.ROOT)+"_"+(j+1)+".csv";
+        String path = "./file_"+json.getProjectName().toLowerCase()+"/training_"+this.json.getProjectName().toLowerCase()+"_"+(j+1)+".csv";
         File newFile = new File(path);
         FileWriter fileWriter = new FileWriter(newFile);
         CSVWriter writer = new CSVWriter(fileWriter);
