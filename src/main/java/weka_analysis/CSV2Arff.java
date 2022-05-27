@@ -33,33 +33,14 @@ public class CSV2Arff {
                 "@attribute avg_loc_added numeric",
                 "@attribute churn numeric",
                 "@attribute max_churn numeric",
+                "@attribute avg_churn numeric",
                 "@attribute auth_number numeric",
                 "@attribute class {true, false}"
         };
-        writer.write("@relation " + fileName.substring(2, fileName.lastIndexOf(".")));
-        writer.newLine();
-        writer.write("@attribute size numeric");
-        writer.newLine();
-        writer.write("@attribute commit_number numeric");
-        writer.newLine();
-        writer.write("@attribute loc_touched numeric");
-        writer.newLine();
-        writer.write("@attribute loc_added numeric");
-        writer.newLine();
-        writer.write("@attribute max_loc_added numeric");
-        writer.newLine();
-        writer.write("@attribute avg_loc_added numeric");
-        writer.newLine();
-        writer.write("@attribute churn numeric");
-        writer.newLine();
-        writer.write("@attribute max_churn numeric");
-        writer.newLine();
-        writer.write("@attribute avg_churn numeric");
-        writer.newLine();
-        writer.write("@attribute auth_number numeric");
-        writer.newLine();
-        writer.write("@attribute class {true, false}");
-        writer.newLine();
+        for(String s:attributes){
+            writer.write(s);
+            writer.newLine();
+        }
         writer.newLine();
         writer.write("@data");
         writer.newLine();
