@@ -157,14 +157,6 @@ public class CSVLine {
 
     }
 
-    public boolean isEqual(CSVLine l){
-        if(!this.version.contentEquals(l.version)) return false;
-        else if(!this.path.contentEquals(l.path)) return false;
-        else if(this.size != l.size) return false;
-        else return this.commitNumber==l.commitNumber;
-
-    }
-
     public boolean isPathEqual(CSVLine l){
         return this.path.contentEquals(l.path);
 

@@ -32,14 +32,6 @@ public class CSVList {
         this.version = version;
     }
 
-    public boolean contains(CSVLine myLine){
-        for (CSVLine l:this.list) {
-            if(myLine.isEqual(l)){
-                return true;
-            }
-        }
-        return false;
-    }
 
     public CSVLine pathContains(String mypath){
         for (CSVLine l:this.list) {
@@ -58,15 +50,6 @@ public class CSVList {
         this.list.addAll(newList.list);
     }
 
-
-    public int getIndex(CSVLine l){
-        int i=0;
-        while(i<this.list.size()){
-            if(this.list.get(i).isEqual(l)) return i;
-            i++;
-        }
-        return -1;
-    }
 
     public int getPathIndex(CSVLine l){
         int i=0;

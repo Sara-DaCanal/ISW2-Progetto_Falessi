@@ -2,13 +2,23 @@ package weka_analysis;
 
 import com.opencsv.CSVWriter;
 import csvfile.CSVList;
+import weka.attributeSelection.BestFirst;
+import weka.attributeSelection.CfsSubsetEval;
 import weka.classifiers.Classifier;
+import weka.classifiers.CostMatrix;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
+import weka.classifiers.meta.CostSensitiveClassifier;
+import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
+import weka.core.Utils;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
+import weka.filters.supervised.attribute.AttributeSelection;
+import weka.filters.supervised.instance.Resample;
+import weka.filters.supervised.instance.SpreadSubsample;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -25,6 +35,7 @@ public class WekaParameters {
     private double[] naiveBayes ={0.0,0.0,0.0,0.0};
     private double[] ibk = {0.0,0.0,0.0,0.0};
     private List<List<String>> results;
+    private List<AnalysisCSV> finalFile;
 
     public WekaParameters(String projectName, List<CSVList> map){
         this.projectName=projectName;
@@ -35,6 +46,7 @@ public class WekaParameters {
     public void wekaAnalysis() throws Exception {
 
         results = new ArrayList<>();
+        finalFile = new ArrayList<>();
 
         for (int i = 0; i < releaseNumber - 1; i++) {
 
@@ -46,6 +58,8 @@ public class WekaParameters {
 
             String trainingArffFile = new CSV2Arff(trainingPath).converter();
 
+            AnalysisCSV final_line = new AnalysisCSV(projectName, (i+1), trainingPath, testPath);
+
             DataSource source1 = new DataSource(trainingArffFile);
             Instances training = source1.getDataSet();
             DataSource source2 = new DataSource(testArffFile);
@@ -55,23 +69,38 @@ public class WekaParameters {
             training.setClassIndex(numAttr - 1);
             testing.setClassIndex(numAttr - 1);
 
+
+            String classname = "Random Forest";
             RandomForest classifier1 = new RandomForest();
-            evalModel(training, testing, classifier1, randomForest, "Random Forest", i);
+            AnalysisCSV final1= AnalysisCSV.copyOf(final_line);
+            final1.setClassifier(classname);
+            evalModel(training, testing, classifier1, randomForest, classname, i, AnalysisCSV.copyOf(final1));
+            balancing(classifier1, AnalysisCSV.copyOf(final1), training, testing);
 
+            classname="Naive Bayes";
             NaiveBayes classifier2 = new NaiveBayes();
-            evalModel(training, testing, classifier2, naiveBayes, "Naive Bayes", i);
+            AnalysisCSV final2= AnalysisCSV.copyOf(final_line);
+            final2.setClassifier(classname);
+            evalModel(training, testing, classifier2, naiveBayes, classname, i, AnalysisCSV.copyOf(final2));
+            balancing(classifier2, AnalysisCSV.copyOf(final2), training, testing);
 
+            classname = "IBk";
             IBk classifier3 = new IBk();
-            evalModel(training, testing, classifier3, ibk, "IBk", i);
+            AnalysisCSV final3= AnalysisCSV.copyOf(final_line);
+            final3.setClassifier(classname);
+            evalModel(training, testing, classifier3, ibk, classname, i, AnalysisCSV.copyOf(final3));
+            balancing(classifier3, AnalysisCSV.copyOf(final3), training, testing);
 
         }
         meanValues("Random Forest", randomForest);
         meanValues("Naive Bayes", naiveBayes);
         meanValues("Ibk", ibk);
         writeOutput2();
+        writeResultsFile();
     }
 
-    private void evalModel(Instances training, Instances testing, Classifier classifier, double[] arr, String className, int i) throws Exception {
+    private void evalModel(Instances training, Instances testing, Classifier classifier, double[] arr, String className, int i, AnalysisCSV line) throws Exception {
+        line.setBalancing("No sampling");
         Evaluation eval = new Evaluation(testing);
         classifier.buildClassifier(training);
         eval.evaluateModel(classifier, testing);
@@ -87,7 +116,13 @@ public class WekaParameters {
         arr1.add(Double.toString(Math.round(eval.recall(1)*100)/100d));
         arr1.add(Double.toString(Math.round(eval.areaUnderROC(1)*100)/100d));
         arr1.add(Double.toString(Math.round(eval.kappa()*100)/100d));
-
+        bestFirst(training, testing, classifier, AnalysisCSV.copyOf(line));
+        line.setFeatureSelection("No selection");
+        costSensitive(training, testing, classifier, AnalysisCSV.copyOf(line));
+        line.setSensitivity("No cost sensitive");
+        line.setRates(eval.truePositiveRate(1), eval.falsePositiveRate(1), eval.trueNegativeRate(1), eval.falseNegativeRate(1));
+        line.setMetrics(eval.precision(1), eval.recall(1),eval.areaUnderROC(1), eval.kappa());
+        finalFile.add(line);
         results.add(new ArrayList<>(arr1));
     }
 
@@ -99,6 +134,104 @@ public class WekaParameters {
         for(double d: arr) arr1.add(Double.toString(Math.round(d/releaseNumber*100)/100d));
         results.add(new ArrayList<>(arr1));
     }
+
+    private void balancing(Classifier classifier, AnalysisCSV line, Instances training, Instances testing ) throws Exception {
+        AnalysisCSV underSampleLine = AnalysisCSV.copyOf(line);
+        underSampleLine.setBalancing("Undersampling");
+        SpreadSubsample spread = new SpreadSubsample();
+        spread.setOptions(Utils.splitOptions("-M 1.0"));
+        Evaluation eval = common_balancing(spread, classifier, training, testing, underSampleLine);
+
+
+        underSampleLine.setRates(eval.truePositiveRate(1), eval.falsePositiveRate(1), eval.trueNegativeRate(1), eval.falseNegativeRate(1));
+        underSampleLine.setMetrics(eval.precision(1), eval.recall(1), eval.areaUnderROC(1), eval.kappa());
+
+        finalFile.add(underSampleLine);
+
+        AnalysisCSV overSampleLine = AnalysisCSV.copyOf(line);
+        overSampleLine.setBalancing("Oversampling");
+        Resample resample = new Resample();
+        resample.setOptions(Utils.splitOptions("-B 1.0 -Z 130.3"));
+        eval = common_balancing(resample, classifier, training, testing, overSampleLine);
+
+
+        overSampleLine.setRates(eval.truePositiveRate(1), eval.falsePositiveRate(1), eval.trueNegativeRate(1), eval.falseNegativeRate(1));
+        overSampleLine.setMetrics(eval.precision(1), eval.recall(1), eval.areaUnderROC(1), eval.kappa());
+        finalFile.add(overSampleLine);
+
+    }
+    private Evaluation common_balancing(Filter resample, Classifier classifier, Instances training, Instances testing, AnalysisCSV line) throws Exception {
+        FilteredClassifier filteredC = new FilteredClassifier();
+        filteredC.setFilter(resample);
+        filteredC.setClassifier(classifier);
+        bestFirst(training, testing, filteredC, AnalysisCSV.copyOf(line));
+        line.setFeatureSelection("No selection");
+        costSensitive(training, testing,filteredC, AnalysisCSV.copyOf(line));
+        line.setSensitivity("No cost sensitive");
+        Evaluation eval = new Evaluation(testing);
+        classifier.buildClassifier(training);
+        eval.evaluateModel(classifier, testing);
+        return eval;
+    }
+
+    private void bestFirst(Instances training, Instances testing, Classifier classifier, AnalysisCSV line) throws Exception {
+        BestFirst bestFirst = new BestFirst();
+        AttributeSelection filter = new AttributeSelection();
+        CfsSubsetEval eval = new CfsSubsetEval();
+        filter.setEvaluator(eval);
+        filter.setSearch(bestFirst);
+        filter.setInputFormat(training);
+        Instances filteredTraining = Filter.useFilter(training, filter);
+        int numAttrFiltered = filteredTraining.numAttributes();
+        filteredTraining.setClassIndex(numAttrFiltered - 1);
+        Instances testingFiltered = Filter.useFilter(testing, filter);
+        testingFiltered.setClassIndex(numAttrFiltered - 1);
+        Evaluation evalClass = new Evaluation(testingFiltered);
+        classifier.buildClassifier(filteredTraining);
+        evalClass.evaluateModel(classifier, testingFiltered);
+        line.setFeatureSelection("Best First");
+        costSensitive(training,testing, classifier, AnalysisCSV.copyOf(line));
+        line.setSensitivity("No cost sensitive");
+        line.setRates(evalClass.truePositiveRate(1), evalClass.falsePositiveRate(1), evalClass.trueNegativeRate(1), evalClass.falseNegativeRate(1));
+        line.setMetrics(evalClass.precision(1), evalClass.recall(1), evalClass.areaUnderROC(1), evalClass.kappa());
+        finalFile.add(line);
+    }
+    private void costSensitive(Instances training, Instances testing, Classifier classifier, AnalysisCSV line) throws Exception {
+        CostSensitiveClassifier c1 = new CostSensitiveClassifier();
+        c1.setClassifier(classifier);
+
+        c1.setCostMatrix( createCostMatrix(1, 10));
+        c1.buildClassifier(training);
+
+        Evaluation eval = new Evaluation(testing,c1.getCostMatrix());
+        eval.evaluateModel(c1, testing);
+        line.setSensitivity("Sensitive threshold");
+        line.setRates(eval.truePositiveRate(1), eval.falsePositiveRate(1), eval.trueNegativeRate(1), eval.falseNegativeRate(1));
+        line.setMetrics(eval.precision(1), eval.recall(1), eval.areaUnderROC(1), eval.kappa());
+        finalFile.add(line);
+
+    }
+    private CostMatrix createCostMatrix(double weightFalsePositive, double weightFalseNegative) {
+        CostMatrix costMatrix = new CostMatrix(2);
+        costMatrix.setCell(0, 0, 0.0);
+        costMatrix.setCell(1, 0, weightFalsePositive);
+        costMatrix.setCell(0, 1, weightFalseNegative);
+        costMatrix.setCell(1, 1, 0.0);
+        return costMatrix;
+    }
+
+    private void writeResultsFile() throws IOException {
+        try(CSVWriter writer = new CSVWriter(new FileWriter(new File("./file_"+projectName.toLowerCase()+"/final_"+projectName.toLowerCase()+".csv")))){
+            String[] header = {"Dataset", "#trainingReleases", "%training", "%defectiveTraining", "%defectiveTesting", "classifier",
+            "balancing", "featureSelection", "sensitivity", "TP", "FP", "TN", "FN", "precision", "recall", "AUC", "kappa"};
+            writer.writeNext(header);
+            for(AnalysisCSV c: finalFile){
+                writer.writeNext(c.toStringArray());
+            }
+            writer.flush();
+        }
+    }
+
 
     private void writeOutput2() throws IOException {
         File file = new File("./file_"+projectName.toLowerCase()+"/results_"+projectName.toLowerCase()+".csv");

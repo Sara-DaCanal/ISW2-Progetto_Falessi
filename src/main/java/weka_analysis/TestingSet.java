@@ -12,7 +12,7 @@ public class TestingSet {
     private static int index=1;
     private String projectName;
     private static TestingSet me = null;
-    private List<CSVList> map = null;
+    private List<CSVList> map;
 
     private TestingSet(String name, List<CSVList> map){
         this.projectName=name;
