@@ -197,19 +197,33 @@ public class WekaParameters {
         finalFile.add(line);
     }
     private void costSensitive(Instances training, Instances testing, Classifier classifier, AnalysisCSV line) throws Exception {
-        CostSensitiveClassifier c1 = new CostSensitiveClassifier();
-        c1.setClassifier(classifier);
+        CostSensitiveClassifier c1 = commonCostSensitive(classifier, training);
+        c1.setMinimizeExpectedCost(true);
+        Evaluation evalThreshold = new Evaluation(testing,c1.getCostMatrix());
+        evalThreshold.evaluateModel(c1, testing);
+        AnalysisCSV lineThresh = AnalysisCSV.copyOf(line);
+        lineThresh.setSensitivity("Sensitive threshold");
+        lineThresh.setRates(evalThreshold.truePositiveRate(1), evalThreshold.falsePositiveRate(1), evalThreshold.trueNegativeRate(1), evalThreshold.falseNegativeRate(1));
+        lineThresh.setMetrics(evalThreshold.precision(1), evalThreshold.recall(1), evalThreshold.areaUnderROC(1), evalThreshold.kappa());
+        finalFile.add(lineThresh);
 
-        c1.setCostMatrix( createCostMatrix(1, 10));
-        c1.buildClassifier(training);
-
-        Evaluation eval = new Evaluation(testing,c1.getCostMatrix());
-        eval.evaluateModel(c1, testing);
-        line.setSensitivity("Sensitive threshold");
-        line.setRates(eval.truePositiveRate(1), eval.falsePositiveRate(1), eval.trueNegativeRate(1), eval.falseNegativeRate(1));
-        line.setMetrics(eval.precision(1), eval.recall(1), eval.areaUnderROC(1), eval.kappa());
+        CostSensitiveClassifier c2 = commonCostSensitive(classifier, training);
+        c2.setMinimizeExpectedCost(false);
+        Evaluation evalLearning = new Evaluation(testing, c2.getCostMatrix());
+        evalLearning.evaluateModel(c2, testing);
+        line.setSensitivity("Sensitive learning");
+        line.setRates(evalLearning.truePositiveRate(1), evalLearning.falsePositiveRate(1), evalLearning.trueNegativeRate(1), evalLearning.falseNegativeRate(1));
+        line.setMetrics(evalLearning.precision(1), evalLearning.recall(1), evalLearning.areaUnderROC(1), evalLearning.kappa());
         finalFile.add(line);
 
+    }
+
+    private CostSensitiveClassifier commonCostSensitive(Classifier classifier, Instances training) throws Exception {
+        CostSensitiveClassifier c1 = new CostSensitiveClassifier();
+        c1.setClassifier(classifier);
+        c1.setCostMatrix( createCostMatrix(1, 10));
+        c1.buildClassifier(training);
+        return c1;
     }
     private CostMatrix createCostMatrix(double weightFalsePositive, double weightFalseNegative) {
         CostMatrix costMatrix = new CostMatrix(2);
