@@ -33,7 +33,7 @@ public class AnalysisCSV {
         this.defectTraining = (t1[1]*100/t1[0]);
         this.defectTesting = (t2[1]*100/t2[0]);
     }
-    private AnalysisCSV(String dataset, int[] percentages, String classifier, String balancing, String featureSelection, String sensitivity, double[] rates, double[]metrics){
+    private AnalysisCSV(String dataset, int[] percentages, String classifier, String balancing, String featureSelection, String sensitivity, double[] rates){
         this.dataset=dataset;
         this.nTraining=percentages[0];
         this.pTraining=percentages[1];
@@ -47,10 +47,10 @@ public class AnalysisCSV {
         this.falsePositive = rates[1];
         this.trueNegative = rates[2];
         this.falseNegative = rates[3];
-        this.precision=metrics[0];
-        this.recall=metrics[1];
-        this.auc=metrics[2];
-        this.kappa=metrics[3];
+        this.precision=rates[4];
+        this.recall=rates[5];
+        this.auc=rates[6];
+        this.kappa=rates[7];
     }
 
     private int[] calculate(String path) throws IOException {
@@ -68,14 +68,11 @@ public class AnalysisCSV {
         return new int[]{this.nTraining, this.pTraining, this.defectTraining, this.defectTesting};
     }
     private double[] ratesArray(){
-        return new double[]{this.truePositive, this.falsePositive, this.trueNegative, this.falseNegative};
-    }
-    private double[] metricsArray(){
-        return new double[]{this.precision, this.recall, this.auc, this.kappa};
+        return new double[]{this.truePositive, this.falsePositive, this.trueNegative, this.falseNegative, this.precision, this.recall, this.auc, this.kappa};
     }
 
     public static AnalysisCSV copyOf(AnalysisCSV oldACSV) {
-        return new AnalysisCSV(oldACSV.dataset, oldACSV.percentagesArray(), oldACSV.classifier, oldACSV.balancing, oldACSV.featureSelection, oldACSV.sensitivity, oldACSV.ratesArray(), oldACSV.metricsArray());
+        return new AnalysisCSV(oldACSV.dataset, oldACSV.percentagesArray(), oldACSV.classifier, oldACSV.balancing, oldACSV.featureSelection, oldACSV.sensitivity, oldACSV.ratesArray());
     }
 
     public void setClassifier(String classifier) {
