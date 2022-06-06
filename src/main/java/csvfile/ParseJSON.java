@@ -119,7 +119,9 @@ public class ParseJSON {
     }
 
     private Version proportion(Version fv, String createDate) throws ParseException {
-        double p=Proportion.getProportion().getP();
+        double p;
+        if(projectName.equals("BOOKKEEPER")) p=Proportion.getProportion().getP();
+        else p = 1.3;
         int fvIndex = this.verList.indexOf(fv)+1;
         Version ov = searchOv(createDate);
         int ovIndex = this.verList.indexOf(ov)+1;

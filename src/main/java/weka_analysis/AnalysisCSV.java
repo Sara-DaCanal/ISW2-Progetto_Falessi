@@ -8,9 +8,9 @@ import java.io.IOException;
 public class AnalysisCSV {
     private String dataset;
     private int nTraining;
-    private int pTraining;
-    private int defectTraining;
-    private int defectTesting;
+    private double pTraining;
+    private double defectTraining;
+    private double defectTesting;
     private String classifier;
     private String balancing;
     private String featureSelection;
@@ -29,13 +29,13 @@ public class AnalysisCSV {
         this.nTraining=index;
         int[] t1 = calculate(training);
         int [] t2 = calculate(testing);
-        this.pTraining = (t1[0]*100/(t1[0]+t2[0]));
-        this.defectTraining = (t1[1]*100/t1[0]);
-        this.defectTesting = (t2[1]*100/t2[0]);
+        this.pTraining = (t1[0]*100d/(t1[0]+t2[0]));
+        this.defectTraining = (t1[1]*100d/t1[0]);
+        this.defectTesting = (t2[1]*100d/t2[0]);
     }
-    private AnalysisCSV(String dataset, int[] percentages, String classifier, String balancing, String featureSelection, String sensitivity, double[] rates){
+    private AnalysisCSV(String dataset, double[] percentages, String classifier, String balancing, String featureSelection, String sensitivity, double[] rates){
         this.dataset=dataset;
-        this.nTraining=percentages[0];
+        this.nTraining= (int) percentages[0];
         this.pTraining=percentages[1];
         this.defectTraining=percentages[2];
         this.defectTesting=percentages[3];
@@ -64,8 +64,8 @@ public class AnalysisCSV {
         }
         return results;
     }
-    private int[] percentagesArray(){
-        return new int[]{this.nTraining, this.pTraining, this.defectTraining, this.defectTesting};
+    private double[] percentagesArray(){
+        return new double[]{this.nTraining, this.pTraining, this.defectTraining, this.defectTesting};
     }
     private double[] ratesArray(){
         return new double[]{this.truePositive, this.falsePositive, this.trueNegative, this.falseNegative, this.precision, this.recall, this.auc, this.kappa};
@@ -108,9 +108,9 @@ public class AnalysisCSV {
         return new String[]{
                 this.dataset,
                 Integer.toString(nTraining),
-                Integer.toString(pTraining),
-                Integer.toString(defectTraining),
-                Integer.toString(defectTesting),
+                Double.toString(round(pTraining)),
+                Double.toString(round(defectTraining)),
+                Double.toString(round(defectTesting)),
                 this.classifier,
                 this.balancing,
                 this.featureSelection,
@@ -123,6 +123,9 @@ public class AnalysisCSV {
                 Double.toString(Math.round(recall*1000000)/1000000d),
                 Double.toString(Math.round(auc*1000000)/1000000d),
                 Double.toString(Math.round(kappa*1000000)/1000000d)};
+    }
+    private double round(double i){
+        return Math.round(i*100)/100d;
     }
 }
 
